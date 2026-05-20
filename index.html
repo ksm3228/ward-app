@@ -147,6 +147,10 @@
   .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { font-size: 14px; color: var(--text2); }
+
+  .inline-edit { width:100%; background:var(--surface2); border:0.5px solid var(--border2); border-radius:var(--radius-sm); padding:6px 10px; font-size:13px; color:var(--text); font-family:inherit; outline:none; }
+  .inline-edit:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(37,99,235,.15); }
+  
 </style>
 </head>
 <body>
@@ -158,7 +162,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.3)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.4)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -422,7 +426,7 @@ function render() {
           <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}">${fmtDate(p.admDate)||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}">${p.doctor||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}">${p.disease||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">특이사항</span><span class="info-val${!p.note?' muted':''}">${p.note||'-'}</span></div>
+          <div class="info-item full"><span class="info-lbl">특이사항</span><input class="inline-edit" value="${p.note||''}" placeholder="특이사항 입력..." onblur="saveNote(${p.id},this.value)" onclick="event.stopPropagation()"></div>
         </div>
         <div class="card-actions">
           <button class="btn-del" onclick="askDel(${p.id})">대기로 변환</button>
@@ -518,6 +522,16 @@ window.confirmMoveRoom = function() {
   persist(); window.closeMoveRoom(); render(); toast(`${tRoom} 병실로 이동되었습니다`);
 };
 
+window.saveNote = function(id, value) {
+  const idx = all.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  if (all[idx].note === value) return;
+  pushHistory();
+  all[idx].note = value;
+  persist();
+  toast('특이사항 저장됨');
+};
+  
 function updateDate() {
   const d=new Date();
   document.getElementById('dateDisplay').textContent=`${d.getMonth()+1}/${d.getDate()} (${['일','월','화','수','목','금','토'][d.getDay()]})`;
