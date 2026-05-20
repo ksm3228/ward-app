@@ -426,6 +426,20 @@
 
   .badge-dr-kim { background: #e0f0ff; color: #1a5fa8; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; flex-shrink: 0; }
   .badge-dr-kwon { background: #f0e8ff; color: #6b21a8; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; flex-shrink: 0; }
+
+  .history-btns { display: flex; gap: 4px; }
+  .btn-history {
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border2);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-history:disabled { opacity: .25; cursor: default; }
+  .btn-history:not(:disabled):active { background: var(--surface2); }
   
 </style>
 </head>
@@ -434,7 +448,13 @@
 <div class="app-bar">
   <div class="app-bar-inner">
     <span class="app-title">🏥 병동 환자 관리</span>
-    <span id="dateDisplay" style="font-size:12px;color:var(--text2)"></span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="history-btns">
+        <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
+        <button class="btn-history" id="btn-redo" onclick="redo()" title="앞으로" disabled>↪</button>
+      </div>
+      <span id="dateDisplay" style="font-size:12px;color:var(--text2)"></span>
+    </div>
   </div>
   <div class="ward-tabs">
     <button class="tab active" onclick="selectWard('85w',this)">85w</button>
@@ -575,6 +595,34 @@
 
 <script>
 const KEY = 'wardApp_v1';
+
+  let history = [], historyIdx = -1;
+
+function pushHistory() {
+  history = history.slice(0, historyIdx + 1);
+  history.push(JSON.stringify(all));
+  historyIdx++;
+  updateHistoryBtns();
+}
+function updateHistoryBtns() {
+  document.getElementById('btn-undo').disabled = historyIdx <= 0;
+  document.getElementById('btn-redo').disabled = historyIdx >= history.length - 1;
+}
+function undo() {
+  if (historyIdx <= 0) return;
+  historyIdx--;
+  all = JSON.parse(history[historyIdx]);
+  persist(); render(); updateHistoryBtns();
+  toast('되돌렸습니다');
+}
+function redo() {
+  if (historyIdx >= history.length - 1) return;
+  historyIdx++;
+  all = JSON.parse(history[historyIdx]);
+  persist(); render(); updateHistoryBtns();
+  toast('앞으로 이동했습니다');
+}
+  
 let all = [], currentWard = '85w', delId = null, nid = Date.now();
 
 const SAMPLE = [
@@ -727,6 +775,7 @@ function onBackdropClick(e) { if (e.target === document.getElementById('sheetBac
 function savePatient() {
   const room = document.getElementById('f_room').value.trim();
   if (!room) { alert('병실번호를 입력하세요.'); return; }
+  pushHistory();
   const fid = document.getElementById('f_id').value;
   const data = {};
   FIELDS.forEach(f => { const el = document.getElementById('f_' + f); data[f] = el ? el.value.trim() : ''; });
@@ -747,6 +796,7 @@ function savePatient() {
 function askDel(id) { delId = id; document.getElementById('confirmBackdrop').classList.add('open'); }
 function closeConfirm() { document.getElementById('confirmBackdrop').classList.remove('open'); delId = null; }
 function confirmDelete() {
+  pushHistory();
   all = all.filter(x => x.id !== delId);
   persist(); closeConfirm(); render();
   toast('삭제되었습니다');
@@ -761,6 +811,7 @@ function updateDate() {
 all = load();
 updateDate();
 render();
+pushHistory();
 </script>
 </body>
 </html>
