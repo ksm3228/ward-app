@@ -160,6 +160,13 @@
     background: #fffbeb;
     border-color: #f59e0b;
   }
+
+.btn-ward-edit { padding: 5px 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface); color: var(--text2); font-size: 12px; cursor: pointer; }
+  .btn-ward-edit.active { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger); }
+  .patient-card.selected { border-color: var(--danger); background: var(--danger-bg); }
+  .check-box { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .patient-card.selected .check-box { background: var(--danger); border-color: var(--danger); color: #fff; }
+  
 </style>
 </head>
 <body>
@@ -171,13 +178,14 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.6)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.7)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
         <button class="btn-history" id="btn-redo" onclick="redo()" title="앞으로" disabled>↪</button>
       </div>
       <span id="dateDisplay" style="font-size:12px;color:var(--text2)"></span>
+      <button class="btn-ward-edit" id="btnWardEdit" onclick="toggleEditMode()" style="display:none">편집</button>
     </div>
   </div>
   <div class="ward-tabs">
@@ -436,7 +444,7 @@ function render() {
     const disHtml = p.discharge ? `<span class="chip chip-green">${p.discharge}</span>` : '<span class="info-val muted">-</span>';
     return `
     <div class="patient-card${isWait?' is-waiting':''}" id="card-${p.id}">
-      <div class="card-header" onclick="toggleCard(${p.id})">
+      <div class="card-header" onclick="${editMode?`toggleSelectCard(event,${p.id})`:`toggleCard(${p.id})`}">
         ${p.doctor==='김성민'?'<span class="badge-dr-kim">김</span>':p.doctor==='권기영'?'<span class="badge-dr-kwon">권</span>':''}
         <span class="badge ${bc}">${bt}</span>
         <span class="card-room">${p.room}</span>
@@ -450,7 +458,7 @@ function render() {
           `:''}
           ${p.days?`<span class="card-days">${p.days}일</span>`:''}
         `:''}
-        <span class="chevron" id="chev-${p.id}">⌄</span>
+        ${editMode ? `<span class="check-box" onclick="toggleSelectCard(event,${p.id})">${selectedIds.has(p.id)?'✓':''}</span>` : `<span class="chevron" id="chev-${p.id}">⌄</span>`}
       </div>
       <div class="card-body" id="body-${p.id}">
         <div class="info-grid">
@@ -481,8 +489,16 @@ window.toggleCard = function(id) {
 };
 window.selectWard = function(ward, btn) {
   currentWard = ward;
+  editMode = false;
+  selectedIds.clear();
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active'); render();
+  btn.classList.add('active');
+  const editBtn = document.getElementById('btnWardEdit');
+  editBtn.style.display = (ward === '75w' || ward === '65w') ? 'block' : 'none';
+  editBtn.classList.remove('active');
+  editBtn.textContent = '편집';
+  editBtn.onclick = toggleEditMode;
+  render();
 };
 window.quickToggle = function(e, id, field) {
   e.stopPropagation();
@@ -660,6 +676,51 @@ function updateEmptySelects() {
     update();
     admDate.addEventListener('change', update);
   }
+}
+
+let editMode = false;
+let selectedIds = new Set();
+
+window.toggleEditMode = function() {
+  editMode = !editMode;
+  selectedIds.clear();
+  const btn = document.getElementById('btnWardEdit');
+  btn.classList.toggle('active', editMode);
+  btn.textContent = editMode ? `삭제(${selectedIds.size})` : '편집';
+  render();
+};
+
+window.toggleSelectCard = function(e, id) {
+  e.stopPropagation();
+  if (!editMode) return;
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  const btn = document.getElementById('btnWardEdit');
+  btn.textContent = selectedIds.size > 0 ? `삭제(${selectedIds.size})` : '편집 취소';
+  // 카드 선택 표시
+  const card = document.getElementById('card-'+id);
+  if (card) card.classList.toggle('selected', selectedIds.has(id));
+  if (selectedIds.size > 0) {
+    btn.onclick = deleteSelected;
+  } else {
+    btn.onclick = toggleEditMode;
+  }
+};
+
+function deleteSelected() {
+  if (selectedIds.size === 0) return;
+  pushHistory();
+  all = all.filter(p => !selectedIds.has(p.id));
+  persist();
+  editMode = false;
+  selectedIds.clear();
+  const btn = document.getElementById('btnWardEdit');
+  btn.classList.remove('active');
+  btn.textContent = '편집';
+  btn.onclick = toggleEditMode;
+  render();
+  toast(`${selectedIds.size === 0 ? '삭제되었습니다' : ''}`);
+  toast('삭제되었습니다');
 }
   
 function updateDate() {
