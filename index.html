@@ -836,12 +836,13 @@ function render() {
         <span class="badge ${bc}">${bt}</span>
         <span class="card-room">${p.room}</span>
         <span class="card-name">${p.name || '<span style="color:var(--text3);font-size:13px">대기</span>'}</span>
-        ${p.days ? `<span class="card-days">${p.days}일</span>` : ''}
+        
         ${!isWait ? `
           <span class="mini-tag ${p.discharge && p.discharge !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')" title="퇴원">퇴원</span>
           <span class="mini-tag ${p.deathNote && p.deathNote !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')" title="임종">임종</span>
           <span class="mini-tag ${p.careConsult && p.careConsult !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')" title="돌봄">돌봄</span>
           <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')" title="경과">경과</span>
+          ${p.days ? `<span class="card-days">${p.days}일</span>` : ''}
         ` : ''}
         <span class="chevron" id="chev-${p.id}">⌄</span>
       </div>
