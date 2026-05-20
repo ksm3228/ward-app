@@ -30,7 +30,6 @@
     --radius-md: 12px;
     --radius-lg: 16px;
   }
-
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #0f0f14;
@@ -50,447 +49,116 @@
       --danger-text: #fca5a5;
     }
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    font-family: -apple-system, 'Malgun Gothic', '맑은 고딕', BlinkMacSystemFont, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 14px;
-    min-height: 100dvh;
-    overscroll-behavior: none;
-  }
-
-  .app-bar {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    background: var(--surface);
-    border-bottom: 0.5px solid var(--border);
-    padding: env(safe-area-inset-top) 0 0;
-  }
-  .app-bar-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px;
-    gap: 10px;
-  }
+  body { font-family: -apple-system, 'Malgun Gothic', '맑은 고딕', BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; min-height: 100dvh; overscroll-behavior: none; }
+  .app-bar { position: sticky; top: 0; z-index: 30; background: var(--surface); border-bottom: 0.5px solid var(--border); padding: env(safe-area-inset-top) 0 0; }
+  .app-bar-inner { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; gap: 10px; }
   .app-title { font-size: 17px; font-weight: 600; color: var(--text); }
-
-  .ward-tabs {
-    display: flex;
-    gap: 4px;
-    padding: 0 16px 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; display: inline-block; margin-left: 6px; vertical-align: middle; transition: background .3s; }
+  .sync-dot.connected { background: var(--success); }
+  .sync-dot.syncing { background: #f59e0b; }
+  .ward-tabs { display: flex; gap: 4px; padding: 0 16px 10px; overflow-x: auto; scrollbar-width: none; }
   .ward-tabs::-webkit-scrollbar { display: none; }
-  .tab {
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: 0.5px solid var(--border2);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    background: var(--surface);
-    color: var(--text2);
-    white-space: nowrap;
-    transition: all .15s;
-  }
-  .tab.active {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-  }
-
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 12px 16px;
-  }
-  .stat-card {
-    background: var(--surface);
-    border-radius: var(--radius-md);
-    padding: 12px 10px;
-    text-align: center;
-    border: 0.5px solid var(--border);
-  }
+  .tab { padding: 6px 16px; border-radius: 20px; border: 0.5px solid var(--border2); font-size: 13px; font-weight: 500; cursor: pointer; background: var(--surface); color: var(--text2); white-space: nowrap; transition: all .15s; }
+  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px; }
+  .stat-card { background: var(--surface); border-radius: var(--radius-md); padding: 12px 10px; text-align: center; border: 0.5px solid var(--border); }
   .stat-num { font-size: 24px; font-weight: 600; line-height: 1; }
   .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 4px; }
   .stat-active { color: var(--success); }
   .stat-wait { color: var(--text3); }
-
-  .section-label {
-    padding: 6px 16px 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text3);
-    letter-spacing: .5px;
-    text-transform: uppercase;
-  }
-
+  .section-label { padding: 6px 16px 6px; font-size: 12px; font-weight: 600; color: var(--text3); letter-spacing: .5px; text-transform: uppercase; }
   .patient-list { padding: 0 16px 100px; }
-  .patient-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    margin-bottom: 10px;
-    overflow: hidden;
-  }
+  .patient-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 10px; overflow: hidden; }
   .patient-card.is-waiting { opacity: .5; }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 13px 14px;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-  }
+  .card-header { display: flex; align-items: center; gap: 8px; padding: 13px 14px; cursor: pointer; user-select: none; -webkit-user-select: none; }
   .card-header:active { background: var(--surface2); }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 6px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+  .badge { display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; }
   .badge-m { background: var(--accent-bg); color: var(--accent-text); }
   .badge-f { background: var(--danger-bg); color: var(--danger-text); }
   .badge-wait { background: var(--surface2); color: var(--text3); }
-
   .card-room { font-size: 12px; color: var(--text2); flex-shrink: 0; }
   .card-name { font-size: 15px; font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .card-days { font-size: 12px; color: var(--text2); flex-shrink: 0; min-width: 30px; text-align: right; }
   .chevron { font-size: 18px; color: var(--text3); transition: transform .2s; flex-shrink: 0; }
   .chevron.open { transform: rotate(180deg); }
-
-  .card-body {
-    border-top: 0.5px solid var(--border);
-    display: none;
-    padding: 12px 14px;
-  }
+  .card-body { border-top: 0.5px solid var(--border); display: none; padding: 12px 14px; }
   .card-body.open { display: block; }
-
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px 14px;
-  }
+  .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; }
   .info-item { display: flex; flex-direction: column; gap: 2px; }
   .info-item.full { grid-column: 1/-1; }
   .info-lbl { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: .3px; }
   .info-val { font-size: 13px; color: var(--text); }
   .info-val.muted { color: var(--text3); }
-
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 500;
-  }
+  .chip { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; }
   .chip-blue { background: var(--accent-bg); color: var(--accent-text); }
   .chip-green { background: var(--success-bg); color: var(--success-text); }
-
-  .card-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-    justify-content: flex-end;
-  }
-  .btn-edit {
-    padding: 7px 18px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .btn-del {
-    padding: 7px 18px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--danger);
-    background: var(--danger-bg);
-    color: var(--danger-text);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .btn-edit:active { opacity: .7; }
-  .btn-del:active { opacity: .7; }
-
-  .fab {
-    position: fixed;
-    bottom: calc(24px + env(safe-area-inset-bottom));
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    font-size: 28px;
-    font-weight: 300;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(37,99,235,.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 20;
-    transition: transform .15s;
-  }
+  .card-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; }
+  .btn-edit { padding: 7px 18px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; }
+  .btn-del { padding: 7px 18px; border-radius: var(--radius-sm); border: 0.5px solid var(--danger); background: var(--danger-bg); color: var(--danger-text); font-size: 13px; font-weight: 500; cursor: pointer; }
+  .btn-edit:active, .btn-del:active { opacity: .7; }
+  .btn-discharge { padding: 7px 18px; border-radius: var(--radius-sm); border: 0.5px solid var(--success); background: var(--success-bg); color: var(--success-text); font-size: 13px; font-weight: 500; cursor: pointer; }
+  .btn-discharge:active { opacity: .7; }
+  .btn-move { padding: 7px 18px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; }
+  .btn-move:active { opacity: .7; }
+  .fab { position: fixed; bottom: calc(24px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #fff; border: none; font-size: 28px; font-weight: 300; cursor: pointer; box-shadow: 0 4px 16px rgba(37,99,235,.35); display: flex; align-items: center; justify-content: center; z-index: 20; transition: transform .15s; }
   .fab:active { transform: scale(.92); }
-
-  .sheet-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.45);
-    z-index: 50;
-    display: none;
-    align-items: flex-end;
-  }
+  .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 50; display: none; align-items: flex-end; }
   .sheet-backdrop.open { display: flex; }
-
-  .sheet {
-    background: var(--surface);
-    border-radius: 20px 20px 0 0;
-    width: 100%;
-    max-height: 92dvh;
-    overflow-y: auto;
-    padding-bottom: calc(24px + env(safe-area-inset-bottom));
-    animation: slideUp .22s cubic-bezier(.32,.72,0,1);
-    -webkit-overflow-scrolling: touch;
-  }
+  .sheet { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-height: 92dvh; overflow-y: auto; padding-bottom: calc(24px + env(safe-area-inset-bottom)); animation: slideUp .22s cubic-bezier(.32,.72,0,1); -webkit-overflow-scrolling: touch; }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-  .sheet-handle {
-    width: 36px;
-    height: 4px;
-    background: var(--border2);
-    border-radius: 2px;
-    margin: 12px auto 0;
-  }
-  .sheet-title {
-    padding: 12px 18px 12px;
-    font-size: 16px;
-    font-weight: 600;
-    border-bottom: 0.5px solid var(--border);
-  }
+  .sheet-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 12px auto 0; }
+  .sheet-title { padding: 12px 18px 12px; font-size: 16px; font-weight: 600; border-bottom: 0.5px solid var(--border); }
   .sheet-body { padding: 16px 18px 0; }
-
   .form-group { margin-bottom: 14px; }
-  .form-group label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text2);
-    margin-bottom: 5px;
-  }
-  .form-group input,
-  .form-group select {
-    width: 100%;
-    padding: 11px 12px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text);
-    font-size: 15px;
-    font-family: inherit;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  .form-group input:focus,
-  .form-group select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(37,99,235,.15);
-  }
-  .form-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .sheet-btns {
-    display: flex;
-    gap: 10px;
-    padding: 14px 18px 0;
-    border-top: 0.5px solid var(--border);
-    margin-top: 16px;
-  }
-  .btn-cancel-sheet {
-    flex: 1;
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text);
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .btn-save-sheet {
-    flex: 2;
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-  }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 5px; }
+  .form-group input, .form-group select { width: 100%; padding: 11px 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); font-size: 15px; font-family: inherit; outline: none; -webkit-appearance: none; appearance: none; }
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+  .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .sheet-btns { display: flex; gap: 10px; padding: 14px 18px 0; border-top: 0.5px solid var(--border); margin-top: 16px; }
+  .btn-cancel-sheet { flex: 1; padding: 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); font-size: 15px; font-weight: 500; cursor: pointer; }
+  .btn-save-sheet { flex: 2; padding: 12px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
   .btn-cancel-sheet:active, .btn-save-sheet:active { opacity: .8; }
-
-  .confirm-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.5);
-    z-index: 60;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
+  .confirm-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 60; display: none; align-items: center; justify-content: center; padding: 24px; }
   .confirm-backdrop.open { display: flex; }
-  .confirm-box {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    padding: 22px 20px 18px;
-    width: 100%;
-    max-width: 320px;
-  }
+  .confirm-box { background: var(--surface); border-radius: var(--radius-lg); padding: 22px 20px 18px; width: 100%; max-width: 320px; }
   .confirm-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
   .confirm-msg { font-size: 13px; color: var(--text2); margin-bottom: 18px; line-height: 1.5; }
   .confirm-btns { display: flex; gap: 8px; }
-  .btn-cc {
-    flex: 1; padding: 10px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text);
-    font-size: 14px;
-    cursor: pointer;
-  }
-  .btn-cd {
-    flex: 1; padding: 10px;
-    border-radius: var(--radius-sm);
-    border: none;
-    background: var(--danger);
-    color: #fff;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 48px 20px;
-    color: var(--text3);
-  }
+  .btn-cc { flex: 1; padding: 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); font-size: 14px; cursor: pointer; }
+  .btn-cd { flex: 1; padding: 10px; border-radius: var(--radius-sm); border: none; background: var(--danger); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
   .empty-icon { font-size: 44px; margin-bottom: 12px; }
   .empty-text { font-size: 14px; }
-
-  .toast {
-    position: fixed;
-    bottom: calc(90px + env(safe-area-inset-bottom));
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--text);
-    color: var(--surface);
-    padding: 10px 20px;
-    border-radius: 24px;
-    font-size: 13px;
-    font-weight: 500;
-    white-space: nowrap;
-    opacity: 0;
-    transition: all .25s;
-    z-index: 80;
-    pointer-events: none;
-  }
+  .toast { position: fixed; bottom: calc(90px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--surface); padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; white-space: nowrap; opacity: 0; transition: all .25s; z-index: 80; pointer-events: none; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
   .badge-dr-kim { background: #e0f0ff; color: #1a5fa8; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; flex-shrink: 0; }
   .badge-dr-kwon { background: #f0e8ff; color: #6b21a8; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; flex-shrink: 0; }
-
   .history-btns { display: flex; gap: 4px; }
-  .btn-history {
-    padding: 5px 10px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface);
-    color: var(--text2);
-    font-size: 16px;
-    cursor: pointer;
-    transition: all .15s;
-  }
+  .btn-history { padding: 5px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface); color: var(--text2); font-size: 16px; cursor: pointer; transition: all .15s; }
   .btn-history:disabled { opacity: .25; cursor: default; }
   .btn-history:not(:disabled):active { background: var(--surface2); }
-
-  .btn-discharge {
-    padding: 7px 18px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--success);
-    background: var(--success-bg);
-    color: var(--success-text);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .btn-discharge:active { opacity: .7; }
-
-.btn-move {
-    padding: 7px 18px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .btn-move:active { opacity: .7; }
-
-  .mini-tag {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 5px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    cursor: pointer;
-  }
+  .mini-tag { display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 5px; white-space: nowrap; flex-shrink: 0; cursor: pointer; }
   .mini-red { background: var(--danger-bg); color: var(--danger-text); border: 0.5px solid var(--danger); }
   .mini-green { background: var(--success-bg); color: var(--success-text); border: 0.5px solid var(--success); }
   .mini-pink { background: #eff6ff; color: #1d4ed8; border: 0.5px solid #3b82f6; }
-  .mini-warn { background: #fff8e1; color: #f57f17; border: 0.5px solid #ffcc02; }
-
   .mini-gray { background: #e0e0e0; color: #424242; border: 0.5px solid #9e9e9e; }
-  
+  .loading-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+  .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 14px; color: var(--text2); }
 </style>
 </head>
 <body>
 
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">데이터 불러오는 중...</div>
+</div>
+
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v2.7)</span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -508,23 +176,13 @@
 </div>
 
 <div class="stats-row">
-  <div class="stat-card">
-    <div class="stat-num" id="stat-total">0</div>
-    <div class="stat-lbl">전체 병상</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-num stat-active" id="stat-active">0</div>
-    <div class="stat-lbl">입원 중</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-num stat-wait" id="stat-wait">0</div>
-    <div class="stat-lbl">대기 중</div>
-  </div>
+  <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">전체 병상</div></div>
+  <div class="stat-card"><div class="stat-num stat-active" id="stat-active">0</div><div class="stat-lbl">입원 중</div></div>
+  <div class="stat-card"><div class="stat-num stat-wait" id="stat-wait">0</div><div class="stat-lbl">대기 중</div></div>
 </div>
 
 <div class="section-label" id="sectionLabel">85w 병동</div>
 <div class="patient-list" id="patientList"></div>
-
 <button class="fab" onclick="openSheet(null)" aria-label="환자 추가">+</button>
 
 <div class="sheet-backdrop" id="sheetBackdrop" onclick="onBackdropClick(event)">
@@ -534,110 +192,26 @@
     <div class="sheet-body">
       <input type="hidden" id="f_id">
       <div class="form-row">
-        <div class="form-group">
-          <label>병실번호 *</label>
-          <input type="text" id="f_room" placeholder="850101" inputmode="numeric">
-        </div>
-        <div class="form-group">
-          <label>구분</label>
-          <select id="f_type">
-            <option value="대기">대기</option>
-            <option value="성인남">성인(남)</option>
-            <option value="성인여">성인(여)</option>
-          </select>
-        </div>
+        <div class="form-group"><label>병실번호 *</label><input type="text" id="f_room" placeholder="850101" inputmode="numeric"></div>
+        <div class="form-group"><label>구분</label><select id="f_type"><option value="대기">대기</option><option value="성인남">성인(남)</option><option value="성인여">성인(여)</option></select></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>성명</label>
-          <input type="text" id="f_name" placeholder="홍길동">
-        </div>
-        <div class="form-group">
-          <label>재원일수</label>
-          <input type="number" id="f_days" placeholder="0" min="0" inputmode="numeric">
-        </div>
+        <div class="form-group"><label>성명</label><input type="text" id="f_name" placeholder="홍길동"></div>
+        <div class="form-group"><label>재원일수</label><input type="number" id="f_days" placeholder="0" min="0" inputmode="numeric"></div>
       </div>
-
-      <div class="form-group">
-        <label>퇴원기록</label>
-        <select id="f_discharge">
-          <option value="">-</option>
-          <option value="퇴원O">퇴원O</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>임종기록</label>
-        <select id="f_deathNote">
-          <option value="">-</option>
-          <option value="임종기록o">임종기록o</option>
-          <option value="전원">전원</option>
-          <option value="임누">임누</option>
-          <option value="집">집</option>
-          <option value="가정형">가정형</option>
-          <option value="전동">전동</option>
-        </select>
-      </div>
-
+      <div class="form-group"><label>퇴원기록</label><select id="f_discharge"><option value="">-</option><option value="퇴원O">퇴원O</option><option value="전원">전원</option></select></div>
+      <div class="form-group"><label>임종기록</label><select id="f_deathNote"><option value="">-</option><option value="전원">전원</option><option value="임누">임누</option><option value="집">집</option><option value="가정형">가정형</option><option value="전동">전동</option><option value="X">X</option></select></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>돌봄상담</label>
-          <select id="f_careConsult">
-            <option value="">-</option>
-            <option value="o">o</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>경과기록</label>
-          <select id="f_progressNote">
-            <option value="n">n</option>
-            <option value="o">o</option>
-            <option value="-">-</option>
-          </select>
-        </div>
+        <div class="form-group"><label>돌봄상담</label><select id="f_careConsult"><option value="">-</option><option value="o">o</option></select></div>
+        <div class="form-group"><label>경과기록</label><select id="f_progressNote"><option value="n">n</option><option value="o">o</option><option value="-">-</option></select></div>
       </div>
-
-
-      
-      <div class="form-group">
-        <label>재입원</label>
-        <select id="f_readmit">
-          <option value="">-</option>
-          <option value="재입원o">재입원o</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>병명</label>
-        <input type="text" id="f_disease" placeholder="예) Rectal ca.">
-      </div>
-      <div class="form-group">
-        <label>특이사항</label>
-        <input type="text" id="f_note" placeholder="예) 장루, 낙상위험 등">
-      </div>
+      <div class="form-group"><label>재입원</label><select id="f_readmit"><option value="">-</option><option value="재입원o">재입원o</option></select></div>
+      <div class="form-group"><label>병명</label><input type="text" id="f_disease" placeholder="예) Rectal ca."></div>
+      <div class="form-group"><label>특이사항</label><input type="text" id="f_note" placeholder="예) 장루, 낙상위험 등"></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>입원일</label>
-          <input type="date" id="f_admDate">
-        </div>
-        <div class="form-group">
-          <label>담당의</label>
-          <select id="f_doctor">
-            <option value="">-</option>
-            <option value="김성민">김성민</option>
-            <option value="권기영">권기영</option>
-          </select>
-        </div>
+        <div class="form-group"><label>입원일</label><input type="date" id="f_admDate"></div>
+        <div class="form-group"><label>담당의</label><select id="f_doctor"><option value="">-</option><option value="김성민">김성민</option><option value="권기영">권기영</option></select></div>
       </div>
-      
-      <div class="form-row">
-
-        
-      </div>
-      <div class="form-row">
-        
-        
-      </div>
-      
     </div>
     <div class="sheet-btns">
       <button class="btn-cancel-sheet" onclick="closeSheet()">취소</button>
@@ -652,7 +226,7 @@
     <div class="confirm-msg">대기 병실로 변경합니다.</div>
     <div class="confirm-btns">
       <button class="btn-cc" onclick="closeConfirm()">취소</button>
-      <button class="btn-cd" onclick="confirmDelete()">삭제</button>
+      <button class="btn-cd" onclick="confirmDelete()">확인</button>
     </div>
   </div>
 </div>
@@ -668,7 +242,7 @@
   </div>
 </div>
 
-  <div class="confirm-backdrop" id="moveRoomBackdrop">
+<div class="confirm-backdrop" id="moveRoomBackdrop">
   <div class="confirm-box">
     <div class="confirm-title">병실 이동</div>
     <div class="confirm-msg" style="margin-bottom:10px">이동할 병실을 선택하세요.</div>
@@ -679,187 +253,163 @@
     </div>
   </div>
 </div>
-  
+
 <div class="toast" id="toast"></div>
 
-<script>
-const KEY = 'wardApp_v3';
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  let history = [], historyIdx = -1;
+const firebaseConfig = {
+  apiKey: "AIzaSyC9k6iGUcNObjxQGtlVOuP5_YSpErT9DtA",
+  authDomain: "ward-app-257c4.firebaseapp.com",
+  databaseURL: "https://ward-app-257c4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ward-app-257c4",
+  storageBucket: "ward-app-257c4.firebasestorage.app",
+  messagingSenderId: "261869081149",
+  appId: "1:261869081149:web:4d2f80c149ab77f3861054"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const dbRef = ref(db, 'patients');
+
+function setSyncDot(state) {
+  const dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot' + (state === 'connected' ? ' connected' : state === 'syncing' ? ' syncing' : '');
+}
+
+const SAMPLE = [
+  {id:1,ward:'85w',room:'850101',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:2,ward:'85w',room:'850201',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:3,ward:'85w',room:'850202',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:4,ward:'85w',room:'850203',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:5,ward:'85w',room:'850204',type:'성인남',name:'박경대',days:'3',disease:'',note:'',admDate:'2026-05-18',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:6,ward:'85w',room:'850301',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:7,ward:'85w',room:'850302',type:'성인남',name:'이진홍',days:'10',disease:'Rectal ca.',note:'장루',admDate:'2026-05-11',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:8,ward:'85w',room:'850303',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:9,ward:'85w',room:'850304',type:'성인여',name:'김지연',days:'21',disease:'위암',note:'fever',admDate:'2026-04-30',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:10,ward:'85w',room:'850401',type:'성인남',name:'정부강',days:'3',disease:'',note:'',admDate:'2026-05-18',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:11,ward:'85w',room:'850402',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:12,ward:'85w',room:'850403',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:13,ward:'85w',room:'850404',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:14,ward:'85w',room:'850501',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:15,ward:'85w',room:'850502',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:16,ward:'85w',room:'850503',type:'성인남',name:'이성우',days:'15',disease:'Lung ca.',note:'Rt. 기흉',admDate:'2026-05-06',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:17,ward:'85w',room:'850504',type:'성인남',name:'박명길',days:'3',disease:'',note:'',admDate:'2026-05-18',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:18,ward:'85w',room:'850601',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:19,ward:'85w',room:'850701',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:20,ward:'85w',room:'850702',type:'성인남',name:'이재인',days:'10',disease:'bladder ca.',note:'',admDate:'2026-05-11',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:21,ward:'85w',room:'850703',type:'성인남',name:'박용조',days:'2',disease:'',note:'',admDate:'2026-05-19',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:22,ward:'85w',room:'850801',type:'성인여',name:'정기숙',days:'45',disease:'',note:'',admDate:'2026-04-06',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:23,ward:'85w',room:'850802',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:24,ward:'85w',room:'850803',type:'성인여',name:'차옥희',days:'17',disease:'Pancreatic ca.',note:'SU 저혈당, Pain',admDate:'2026-05-04',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:25,ward:'85w',room:'850804',type:'성인여',name:'배미경',days:'31',disease:'Cervical ca.',note:'both PCN',admDate:'2026-04-20',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:26,ward:'85w',room:'850901',type:'성인여',name:'이화연',days:'9',disease:'AGC',note:'NG feeding',admDate:'2026-05-12',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:27,ward:'85w',room:'850902',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:28,ward:'85w',room:'850903',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+  {id:29,ward:'85w',room:'850904',type:'성인남',name:'정남이',days:'13',disease:'',note:'',admDate:'2026-05-08',doctor:'김성민',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''},
+];
+
+let all = [], currentWard = '85w', delId = null, nid = Date.now();
+let historyStack = [], historyIdx = -1;
+
+async function persist() {
+  setSyncDot('syncing');
+  try { await set(dbRef, all); setSyncDot('connected'); }
+  catch(e) { setSyncDot(''); toast('저장 실패 - 네트워크 확인'); }
+}
+
+onValue(dbRef, (snapshot) => {
+  const data = snapshot.val();
+  if (data && Array.isArray(data)) {
+    all = data.map(p => ({ careConsult:'', progressNote:'n', deathNote:'', readmit:'', ...p }));
+  } else if (!data) {
+    all = JSON.parse(JSON.stringify(SAMPLE));
+    set(dbRef, all);
+  }
+  setSyncDot('connected');
+  document.getElementById('loadingOverlay').style.display = 'none';
+  render();
+}, () => {
+  setSyncDot('');
+  document.getElementById('loadingOverlay').style.display = 'none';
+  toast('Firebase 연결 실패');
+});
 
 function pushHistory() {
-  history = history.slice(0, historyIdx + 1);
-  history.push(JSON.stringify(all));
+  historyStack = historyStack.slice(0, historyIdx + 1);
+  historyStack.push(JSON.stringify(all));
   historyIdx++;
   updateHistoryBtns();
 }
 function updateHistoryBtns() {
   document.getElementById('btn-undo').disabled = historyIdx <= 0;
-  document.getElementById('btn-redo').disabled = historyIdx >= history.length - 1;
+  document.getElementById('btn-redo').disabled = historyIdx >= historyStack.length - 1;
 }
-function undo() {
+window.undo = function() {
   if (historyIdx <= 0) return;
   historyIdx--;
-  all = JSON.parse(history[historyIdx]);
-  persist(); render(); updateHistoryBtns();
-  toast('되돌렸습니다');
-}
-function redo() {
-  if (historyIdx >= history.length - 1) return;
+  all = JSON.parse(historyStack[historyIdx]);
+  persist(); render(); updateHistoryBtns(); toast('되돌렸습니다');
+};
+window.redo = function() {
+  if (historyIdx >= historyStack.length - 1) return;
   historyIdx++;
-  all = JSON.parse(history[historyIdx]);
-  persist(); render(); updateHistoryBtns();
-  toast('앞으로 이동했습니다');
-}
-  
-let all = [], currentWard = '85w', delId = null, nid = Date.now();
+  all = JSON.parse(historyStack[historyIdx]);
+  persist(); render(); updateHistoryBtns(); toast('앞으로 이동했습니다');
+};
 
-const SAMPLE = [
-  {id:1,ward:'85w',room:'850101',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:2,ward:'85w',room:'850201',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:3,ward:'85w',room:'850202',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:4,ward:'85w',room:'850203',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:5,ward:'85w',room:'850204',type:'성인남',name:'박경대',days:'3',disease:'',note:'',admDate:'2026-05-18',doctor:'김성민',discharge:'퇴원X',disDate:'2026-05-18',surgery:'O',chart:"850204'",nurse:"박경대'",next:'2026-05-21',remark:'Not Yet'},
-  {id:6,ward:'85w',room:'850301',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:7,ward:'85w',room:'850302',type:'성인남',name:'이진홍',days:'10',disease:'Rectal ca.',note:'장루',admDate:'2026-05-11',doctor:'김성민',discharge:'퇴원X',disDate:'2026-05-11',surgery:'O',chart:"850302'",nurse:"이진홍'",next:'2026-05-14',remark:'O'},
-  {id:8,ward:'85w',room:'850303',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:9,ward:'85w',room:'850304',type:'성인여',name:'김지연',days:'21',disease:'위암',note:'fever',admDate:'2026-04-30',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:10,ward:'85w',room:'850401',type:'성인남',name:'정부강',days:'3',disease:'',note:'',admDate:'2026-05-18',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:11,ward:'85w',room:'850402',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:12,ward:'85w',room:'850403',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:13,ward:'85w',room:'850404',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:14,ward:'85w',room:'850501',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:15,ward:'85w',room:'850502',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:16,ward:'85w',room:'850503',type:'성인남',name:'이성우',days:'15',disease:'Lung ca.',note:'Rt. 기흉',admDate:'2026-05-06',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:17,ward:'85w',room:'850504',type:'성인남',name:'박명길',days:'3',disease:'',note:'',admDate:'2026-05-18',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:18,ward:'85w',room:'850601',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:19,ward:'85w',room:'850701',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:20,ward:'85w',room:'850702',type:'성인남',name:'이재인',days:'10',disease:'bladder ca.',note:'',admDate:'2026-05-11',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:21,ward:'85w',room:'850703',type:'성인남',name:'박용조',days:'2',disease:'',note:'',admDate:'2026-05-19',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:22,ward:'85w',room:'850801',type:'성인여',name:'정기숙',days:'45',disease:'',note:'',admDate:'2026-04-06',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:23,ward:'85w',room:'850802',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:24,ward:'85w',room:'850803',type:'성인여',name:'차옥희',days:'17',disease:'Pancreatic ca.',note:'SU 저혈당, Pain',admDate:'2026-05-04',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:25,ward:'85w',room:'850804',type:'성인여',name:'배미경',days:'31',disease:'Cervical ca.',note:'both PCN',admDate:'2026-04-20',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:26,ward:'85w',room:'850901',type:'성인여',name:'이화연',days:'9',disease:'AGC',note:'NG feeding',admDate:'2026-05-12',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:27,ward:'85w',room:'850902',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:28,ward:'85w',room:'850903',type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-  {id:29,ward:'85w',room:'850904',type:'성인남',name:'정남이',days:'13',disease:'',note:'',admDate:'2026-05-08',doctor:'김성민',discharge:'',disDate:'',surgery:'',chart:'',nurse:'',next:'',remark:''},
-];
-
-function load() {
-  try {
-    const r = localStorage.getItem(KEY);
-    if (!r) return JSON.parse(JSON.stringify(SAMPLE));
-    const data = JSON.parse(r);
-    if (!Array.isArray(data) || data.length === 0) return JSON.parse(JSON.stringify(SAMPLE));
-    // 기존 데이터에 누락된 필드 기본값 보완
-    return data.map(p => ({
-      careConsult: '', progressNote: 'n', deathNote: '', readmit: '',
-      ...p
-    }));
-  } catch(e) {
-    return JSON.parse(JSON.stringify(SAMPLE));
-  }
-}
-function persist() {
-  try { localStorage.setItem(KEY, JSON.stringify(all)); } catch(e) {}
-}
-
-function fmtDate(d) {
-  if (!d) return '';
-  return d.replace(/^20/, '').replace(/-/g, '/');
-}
+function fmtDate(d) { if (!d) return ''; return d.replace(/^20/, '').replace(/-/g, '/'); }
 function today() { return new Date().toISOString().slice(0,10); }
-
-function toast(msg) {
+window.toast = function(msg) {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
+  el.textContent = msg; el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2000);
-}
-
-function getProgressClass(p) {
-  const prog = getEffectiveProgress(p);
-  if (prog === 'o') return 'mini-green';
-  if (prog === '-') return 'mini-red';
-  return 'mini-pink'; // 'n'
-}
+};
 
 function getEffectiveProgress(p) {
   if (p.progressNote === 'o') return 'o';
   if (p.progressNote === '-') return '-';
   const days = parseInt(p.days) || 0;
-  if (days >= 3) return '-';
-  return 'n';
+  return days >= 3 ? '-' : 'n';
+}
+function getProgressClass(p) {
+  const prog = getEffectiveProgress(p);
+  if (prog === 'o') return 'mini-green';
+  if (prog === '-') return 'mini-red';
+  return 'mini-pink';
 }
 
-function quickToggle(e, id, field) {
-  e.stopPropagation();
-  const idx = all.findIndex(x => x.id === id);
-  if (idx < 0) return;
-  pushHistory();
-
-  if (field === 'discharge') {
-    const opts = ['', '퇴원O', '전원'];
-    const cur = opts.indexOf(all[idx].discharge);
-    all[idx].discharge = opts[(cur + 1) % opts.length];
-  } else if (field === 'deathNote') {
-    const opts = ['', '전원', '임누', '집', '가정형', '전동', 'X'];
-    const cur = opts.indexOf(all[idx].deathNote);
-    all[idx].deathNote = opts[(cur + 1) % opts.length];
-  } else if (field === 'careConsult') {
-    all[idx].careConsult = all[idx].careConsult === 'o' ? '' : 'o';
-  } else if (field === 'progressNote') {
-    const cur = getEffectiveProgress(all[idx]);
-    all[idx].progressNote = cur === 'o' ? 'n' : 'o';
-  }
-
-  persist(); render();
-}
-  
 function render() {
   const list = all.filter(p => p.ward === currentWard).sort((a,b) => a.room.localeCompare(b.room));
   document.getElementById('sectionLabel').textContent = currentWard + ' 병동';
-
   const active = list.filter(p => p.name && p.type !== '대기').length;
   const wait = list.filter(p => !p.name || p.type === '대기').length;
   document.getElementById('stat-total').textContent = list.length;
   document.getElementById('stat-active').textContent = active;
   document.getElementById('stat-wait').textContent = wait;
-
   const el = document.getElementById('patientList');
-  if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>';
-    return;
-  }
-
+  if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>'; return; }
   el.innerHTML = list.map(p => {
     const isWait = !p.name || p.type === '대기';
     const bc = p.type === '성인남' ? 'badge-m' : p.type === '성인여' ? 'badge-f' : 'badge-wait';
     const bt = p.type === '성인남' ? '남' : p.type === '성인여' ? '여' : '대기';
-
-    const disHtml = p.discharge
-      ? `<span class="chip ${p.discharge === '퇴원X' ? 'chip-blue' : 'chip-green'}">${p.discharge}</span>`
-      : '<span class="info-val muted">-</span>';
-    const surHtml = p.surgery === 'O'
-      ? '<span class="chip chip-green">✓ 완료</span>'
-      : p.surgery ? `<span class="info-val">${p.surgery}</span>` : '<span class="info-val muted">-</span>';
-
+    const disHtml = p.discharge ? `<span class="chip chip-green">${p.discharge}</span>` : '<span class="info-val muted">-</span>';
     return `
-    <div class="patient-card${isWait ? ' is-waiting' : ''}" id="card-${p.id}">
+    <div class="patient-card${isWait?' is-waiting':''}" id="card-${p.id}">
       <div class="card-header" onclick="toggleCard(${p.id})">
-        ${p.doctor === '김성민' ? '<span class="badge-dr-kim">김</span>' : p.doctor === '권기영' ? '<span class="badge-dr-kwon">권</span>' : ''}
+        ${p.doctor==='김성민'?'<span class="badge-dr-kim">김</span>':p.doctor==='권기영'?'<span class="badge-dr-kwon">권</span>':''}
         <span class="badge ${bc}">${bt}</span>
         <span class="card-room">${p.room}</span>
-        <span class="card-name">${p.name || '<span style="color:var(--text3);font-size:13px">대기</span>'}</span>
-        
-        ${!isWait ? `
-          <span class="mini-tag ${p.discharge && p.discharge !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')" title="퇴원">퇴원</span>
-          <span class="mini-tag ${p.deathNote && p.deathNote !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')" title="임종">임종</span>
-          <span class="mini-tag ${p.readmit === '재입원o' ? 'mini-gray' : p.careConsult && p.careConsult !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')" title="돌봄">돌봄</span>
-          <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')" title="경과">경과</span>
-          ${p.days ? `<span class="card-days">${p.days}일</span>` : ''}
-        ` : ''}
+        <span class="card-name">${p.name||'<span style="color:var(--text3);font-size:13px">대기</span>'}</span>
+        ${!isWait?`
+          <span class="mini-tag ${p.discharge?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')">퇴원</span>
+          <span class="mini-tag ${p.deathNote?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')">임종</span>
+          <span class="mini-tag ${p.readmit==='재입원o'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')">돌봄</span>
+          <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')">경과</span>
+          ${p.days?`<span class="card-days">${p.days}일</span>`:''}
+        `:''}
         <span class="chevron" id="chev-${p.id}">⌄</span>
       </div>
       <div class="card-body" id="body-${p.id}">
@@ -869,12 +419,10 @@ function render() {
           <div class="info-item"><span class="info-lbl">돌봄상담</span><span class="info-val${!p.careConsult?' muted':''}">${p.careConsult||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">경과기록</span><span class="info-val">${getEffectiveProgress(p)}</span></div>
           <div class="info-item"><span class="info-lbl">재입원</span><span class="info-val${!p.readmit?' muted':''}">${p.readmit||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}\">${fmtDate(p.admDate)||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}\">${p.doctor||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}\">${p.disease||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">특이사항</span><span class="info-val${!p.note?' muted':''}\">${p.note||'-'}</span></div>
-          
-         
+          <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}">${fmtDate(p.admDate)||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}">${p.doctor||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}">${p.disease||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">특이사항</span><span class="info-val${!p.note?' muted':''}">${p.note||'-'}</span></div>
         </div>
         <div class="card-actions">
           <button class="btn-del" onclick="askDel(${p.id})">삭제</button>
@@ -887,152 +435,94 @@ function render() {
   }).join('');
 }
 
-function toggleCard(id) {
-  const body = document.getElementById('body-' + id);
-  const chev = document.getElementById('chev-' + id);
-  const open = body.classList.toggle('open');
-  chev.classList.toggle('open', open);
-}
-
-function selectWard(ward, btn) {
+window.toggleCard = function(id) {
+  const body = document.getElementById('body-'+id), chev = document.getElementById('chev-'+id);
+  chev.classList.toggle('open', body.classList.toggle('open'));
+};
+window.selectWard = function(ward, btn) {
   currentWard = ward;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-}
+  btn.classList.add('active'); render();
+};
+window.quickToggle = function(e, id, field) {
+  e.stopPropagation();
+  const idx = all.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  pushHistory();
+  if (field === 'discharge') { const o=['','퇴원O','전원']; all[idx].discharge=o[(o.indexOf(all[idx].discharge)+1)%o.length]; }
+  else if (field === 'deathNote') { const o=['','전원','임누','집','가정형','전동','X']; all[idx].deathNote=o[(o.indexOf(all[idx].deathNote)+1)%o.length]; }
+  else if (field === 'careConsult') { all[idx].careConsult = all[idx].careConsult==='o'?'':'o'; }
+  else if (field === 'progressNote') { all[idx].progressNote = getEffectiveProgress(all[idx])==='o'?'n':'o'; }
+  persist(); render();
+};
 
 const FIELDS = ['room','type','name','days','disease','note','admDate','doctor','discharge','deathNote','careConsult','progressNote','readmit'];
-
-function openSheet(id) {
+window.openSheet = function(id) {
   document.getElementById('sheetTitle').textContent = id ? '환자 수정' : '환자 등록';
   document.getElementById('f_id').value = id || '';
-  if (id) {
-    const p = all.find(x => x.id === id);
-    FIELDS.forEach(f => { const el = document.getElementById('f_' + f); if (el) el.value = p[f] || ''; });
-  } else {
-    FIELDS.forEach(f => { const el = document.getElementById('f_' + f); if (el) el.value = ''; });
-    document.getElementById('f_type').value = '대기';
-    document.getElementById('f_admDate').value = today();
-    document.getElementById('f_doctor').value = '';
-  }
+  if (id) { const p = all.find(x => x.id===id); FIELDS.forEach(f => { const el=document.getElementById('f_'+f); if(el) el.value=p[f]||''; }); }
+  else { FIELDS.forEach(f => { const el=document.getElementById('f_'+f); if(el) el.value=''; }); document.getElementById('f_type').value='대기'; document.getElementById('f_admDate').value=today(); }
   document.getElementById('sheetBackdrop').classList.add('open');
-  document.getElementById('f_room').focus();
-}
-function closeSheet() { document.getElementById('sheetBackdrop').classList.remove('open'); }
-function onBackdropClick(e) { if (e.target === document.getElementById('sheetBackdrop')) closeSheet(); }
-
-function savePatient() {
+};
+window.closeSheet = function() { document.getElementById('sheetBackdrop').classList.remove('open'); };
+window.onBackdropClick = function(e) { if(e.target===document.getElementById('sheetBackdrop')) window.closeSheet(); };
+window.savePatient = function() {
   const room = document.getElementById('f_room').value.trim();
   if (!room) { alert('병실번호를 입력하세요.'); return; }
   pushHistory();
-  const fid = document.getElementById('f_id').value;
-  const data = {};
-  FIELDS.forEach(f => { const el = document.getElementById('f_' + f); data[f] = el ? el.value.trim() : ''; });
-  if (fid) {
-    const idx = all.findIndex(x => x.id == fid);
-    if (idx >= 0) all[idx] = { ...all[idx], ...data };
-    toast('수정되었습니다');
-  } else {
-    all.push({ id: nid++, ward: currentWard, ...data });
-    all.sort((a,b) => a.room.localeCompare(b.room));
-    toast('등록되었습니다');
-  }
-  persist();
-  closeSheet();
-  render();
-}
+  const fid = document.getElementById('f_id').value, data = {};
+  FIELDS.forEach(f => { const el=document.getElementById('f_'+f); data[f]=el?el.value.trim():''; });
+  if (fid) { const idx=all.findIndex(x=>x.id==fid); if(idx>=0) all[idx]={...all[idx],...data}; toast('수정되었습니다'); }
+  else { all.push({id:nid++,ward:currentWard,...data}); all.sort((a,b)=>a.room.localeCompare(b.room)); toast('등록되었습니다'); }
+  persist(); window.closeSheet(); render();
+};
 
-function askDel(id) { delId = id; document.getElementById('confirmBackdrop').classList.add('open'); }
-function closeConfirm() { document.getElementById('confirmBackdrop').classList.remove('open'); delId = null; }
-function confirmDelete() {
+window.askDel = function(id) { delId=id; document.getElementById('confirmBackdrop').classList.add('open'); };
+window.closeConfirm = function() { document.getElementById('confirmBackdrop').classList.remove('open'); delId=null; };
+window.confirmDelete = function() {
   pushHistory();
-  const idx = all.findIndex(x => x.id === delId);
-  if (idx >= 0) {
-    all[idx] = { ...all[idx], type:'대기', name:'', days:'', disease:'', note:'', admDate:'', doctor:'', discharge:'', deathNote:'' };
-  }
-  persist(); closeConfirm(); render();
-  toast('대기 병실로 변경되었습니다');
-}
+  const idx = all.findIndex(x=>x.id===delId);
+  if(idx>=0) all[idx]={...all[idx],type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''};
+  persist(); window.closeConfirm(); render(); toast('대기 병실로 변경되었습니다');
+};
 
 let dischargeTargetId = null;
-
-function moveToDischarged(id) {
-  dischargeTargetId = id;
-  document.getElementById('dischargeBackdrop').classList.add('open');
-}
-function closeDischarge() {
-  document.getElementById('dischargeBackdrop').classList.remove('open');
-  dischargeTargetId = null;
-}
-function confirmDischarge() {
+window.moveToDischarged = function(id) { dischargeTargetId=id; document.getElementById('dischargeBackdrop').classList.add('open'); };
+window.closeDischarge = function() { document.getElementById('dischargeBackdrop').classList.remove('open'); dischargeTargetId=null; };
+window.confirmDischarge = function() {
   pushHistory();
-  const idx = all.findIndex(x => x.id === dischargeTargetId);
-  if (idx >= 0) {
-    const p = all[idx];
-    all.push({ ...p, id: nid++, ward: '퇴원환자' });
-    all[idx] = { ...p, type:'대기', name:'', days:'', disease:'', note:'', admDate:'', doctor:'', discharge:'', deathNote:'' };
-  }
-  persist(); closeDischarge(); render();
-  toast('퇴원환자로 이동되었습니다');
-}
+  const idx = all.findIndex(x=>x.id===dischargeTargetId);
+  if(idx>=0) { const p=all[idx]; all.push({...p,id:nid++,ward:'퇴원환자'}); all[idx]={...p,type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''}; }
+  persist(); window.closeDischarge(); render(); toast('퇴원환자로 이동되었습니다');
+};
 
-  let moveRoomTargetId = null;
-
-function openMoveRoom(id) {
-  moveRoomTargetId = id;
-  const select = document.getElementById('moveRoomSelect');
-  // 85w 병동의 대기 병실만 보여줌
-  const emptyRooms = all
-    .filter(p => p.ward === '85w' && (!p.name || p.type === '대기'))
-    .sort((a,b) => a.room.localeCompare(b.room));
-  if (!emptyRooms.length) {
-    alert('이동 가능한 빈 병실이 없습니다.');
-    return;
-  }
-  select.innerHTML = emptyRooms.map(p => `<option value="${p.room}">${p.room}</option>`).join('');
+let moveRoomTargetId = null;
+window.openMoveRoom = function(id) {
+  moveRoomTargetId=id;
+  const emptyRooms=all.filter(p=>p.ward===currentWard&&(!p.name||p.type==='대기')).sort((a,b)=>a.room.localeCompare(b.room));
+  if(!emptyRooms.length){alert('이동 가능한 빈 병실이 없습니다.');return;}
+  document.getElementById('moveRoomSelect').innerHTML=emptyRooms.map(p=>`<option value="${p.room}">${p.room}</option>`).join('');
   document.getElementById('moveRoomBackdrop').classList.add('open');
-}
-function closeMoveRoom() {
-  document.getElementById('moveRoomBackdrop').classList.remove('open');
-  moveRoomTargetId = null;
-}
-function confirmMoveRoom() {
-  const targetRoom = document.getElementById('moveRoomSelect').value;
-  const targetIdx = all.findIndex(p => p.ward === '85w' && p.room === targetRoom);
-  const sourceIdx = all.findIndex(p => p.id === moveRoomTargetId);
-
-  if (targetIdx < 0 || sourceIdx < 0) return;
-
-  // 대상 병실에 이미 환자가 있는지 재확인
-  if (all[targetIdx].name && all[targetIdx].type !== '대기') {
-    alert('환자가 있는 병실입니다.');
-    return;
-  }
-
+};
+window.closeMoveRoom = function() { document.getElementById('moveRoomBackdrop').classList.remove('open'); moveRoomTargetId=null; };
+window.confirmMoveRoom = function() {
+  const targetRoom=document.getElementById('moveRoomSelect').value;
+  const targetIdx=all.findIndex(p=>p.ward===currentWard&&p.room===targetRoom);
+  const sourceIdx=all.findIndex(p=>p.id===moveRoomTargetId);
+  if(targetIdx<0||sourceIdx<0)return;
+  if(all[targetIdx].name&&all[targetIdx].type!=='대기'){alert('환자가 있는 병실입니다.');return;}
   pushHistory();
-  const sourcePatient = all[sourceIdx];
-  const targetRoomNum = all[targetIdx].room;
-  const sourceRoomNum = sourcePatient.room;
-
-  // 환자를 대상 병실로 이동
-  all[targetIdx] = { ...sourcePatient, room: targetRoomNum };
-  // 원래 병실은 대기로
-  all[sourceIdx] = { ...sourcePatient, type:'대기', room: sourceRoomNum, name:'', days:'', disease:'', note:'', admDate:'', doctor:'', discharge:'', deathNote:'' };
-
-  persist(); closeMoveRoom(); render();
-  toast(`${targetRoomNum} 병실로 이동되었습니다`);
-}
+  const sp=all[sourceIdx], tRoom=all[targetIdx].room, sRoom=sp.room;
+  all[targetIdx]={...sp,room:tRoom};
+  all[sourceIdx]={...sp,type:'대기',room:sRoom,name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''};
+  persist(); window.closeMoveRoom(); render(); toast(`${tRoom} 병실로 이동되었습니다`);
+};
 
 function updateDate() {
-  const d = new Date();
-  document.getElementById('dateDisplay').textContent =
-    `${d.getMonth()+1}/${d.getDate()} (${['일','월','화','수','목','금','토'][d.getDay()]})`;
+  const d=new Date();
+  document.getElementById('dateDisplay').textContent=`${d.getMonth()+1}/${d.getDate()} (${['일','월','화','수','목','금','토'][d.getDay()]})`;
 }
-
-all = load();
 updateDate();
-render();
-pushHistory();
 </script>
 </body>
 </html>
