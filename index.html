@@ -481,6 +481,8 @@
   .mini-green { background: var(--success-bg); color: var(--success-text); border: 0.5px solid var(--success); }
   .mini-pink { background: #eff6ff; color: #1d4ed8; border: 0.5px solid #3b82f6; }
   .mini-warn { background: #fff8e1; color: #f57f17; border: 0.5px solid #ffcc02; }
+
+  .mini-gray { background: #e0e0e0; color: #424242; border: 0.5px solid #9e9e9e; }
   
 </style>
 </head>
@@ -488,7 +490,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v2.3)</span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v2.4)</span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -597,6 +599,13 @@
 
 
       
+      <div class="form-group">
+        <label>재입원</label>
+        <select id="f_readmit">
+          <option value="">-</option>
+          <option value="재입원o">재입원o</option>
+        </select>
+      </div>
       <div class="form-group">
         <label>병명</label>
         <input type="text" id="f_disease" placeholder="예) Rectal ca.">
@@ -836,7 +845,7 @@ function render() {
         ${!isWait ? `
           <span class="mini-tag ${p.discharge && p.discharge !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')" title="퇴원">퇴원</span>
           <span class="mini-tag ${p.deathNote && p.deathNote !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')" title="임종">임종</span>
-          <span class="mini-tag ${p.careConsult && p.careConsult !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')" title="돌봄">돌봄</span>
+          <span class="mini-tag ${p.readmit === '재입원o' ? 'mini-gray' : p.careConsult && p.careConsult !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')" title="돌봄">돌봄</span>
           <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')" title="경과">경과</span>
           ${p.days ? `<span class="card-days">${p.days}일</span>` : ''}
         ` : ''}
@@ -848,7 +857,8 @@ function render() {
           <div class="info-item"><span class="info-lbl">임종기록</span><span class="info-val${!p.deathNote?' muted':''}">${p.deathNote||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">돌봄상담</span><span class="info-val${!p.careConsult?' muted':''}">${p.careConsult||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">경과기록</span><span class="info-val">${getEffectiveProgress(p)}</span></div>
-          <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}\">${fmtDate(p.admDate)||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">재입원</span><span class="info-val${!p.readmit?' muted':''}">${p.readmit||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">입원일</span>
           <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}\">${p.doctor||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}\">${p.disease||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">특이사항</span><span class="info-val${!p.note?' muted':''}\">${p.note||'-'}</span></div>
@@ -880,7 +890,7 @@ function selectWard(ward, btn) {
   render();
 }
 
-const FIELDS = ['room','type','name','days','disease','note','admDate','doctor','discharge','deathNote','careConsult','progressNote'];
+const FIELDS = ['room','type','name','days','disease','note','admDate','doctor','discharge','deathNote','careConsult','progressNote','readmit'];
 
 function openSheet(id) {
   document.getElementById('sheetTitle').textContent = id ? '환자 수정' : '환자 등록';
