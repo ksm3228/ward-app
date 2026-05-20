@@ -496,7 +496,7 @@
       </div>
 
       <div class="form-group">
-        <label>퇴원구분</label>
+        <label>퇴원기록</label>
         <select id="f_discharge">
           <option value="">-</option>
           <option value="퇴원X">퇴원X</option>
@@ -677,7 +677,7 @@ function render() {
           <div class="info-item"><span class="info-lbl">특이사항</span><span class="info-val${!p.note?' muted':''}\">${p.note||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}\">${fmtDate(p.admDate)||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}\">${p.doctor||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">퇴원구분</span>${disHtml}</div>
+          <div class="info-item"><span class="info-lbl">퇴원기록</span>${disHtml}</div>
           <div class="info-item"><span class="info-lbl">임종기록</span><span class="info-val${!p.deathNote?' muted':''}">${p.deathNote||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">차트번호</span><span class="info-val${!p.chart?' muted':''}\">${p.chart||'-'}</span></div>
          
