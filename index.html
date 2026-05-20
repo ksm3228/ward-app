@@ -162,7 +162,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.4)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.5)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -209,7 +209,7 @@
         <div class="form-group"><label>돌봄상담</label><select id="f_careConsult"><option value="">-</option><option value="o">o</option></select></div>
         <div class="form-group"><label>경과기록</label><select id="f_progressNote"><option value="n">n</option><option value="o">o</option><option value="-">-</option></select></div>
       </div>
-      <div class="form-group"><label>재입원</label><select id="f_readmit"><option value="">-</option><option value="가정형/재입원">가정형/재입원</option></select></div>
+      <div class="form-group"><label>가정형/재입원</label><select id="f_readmit"><option value="">-</option><option value="가정형/재입원">가정형/재입원</option></select></div>
       <div class="form-group"><label>병명</label><input type="text" id="f_disease" placeholder="예) Rectal ca."></div>
       <div class="form-group"><label>특이사항</label><input type="text" id="f_note" placeholder="예) 장루, 낙상위험 등"></div>
       <div class="form-row">
@@ -422,7 +422,7 @@ function render() {
           <div class="info-item"><span class="info-lbl">임종기록</span><span class="info-val${!p.deathNote?' muted':''}">${p.deathNote||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">돌봄상담</span><span class="info-val${!p.careConsult?' muted':''}">${p.careConsult||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">경과기록</span><span class="info-val">${getEffectiveProgress(p)}</span></div>
-          <div class="info-item"><span class="info-lbl">재입원</span><span class="info-val${!p.readmit?' muted':''}">${p.readmit||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">가정형/재입원</span><span class="info-val${!p.readmit?' muted':''}">${p.readmit||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}">${fmtDate(p.admDate)||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}">${p.doctor||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}">${p.disease||'-'}</span></div>
