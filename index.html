@@ -452,6 +452,18 @@
     cursor: pointer;
   }
   .btn-discharge:active { opacity: .7; }
+
+.btn-move {
+    padding: 7px 18px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-move:active { opacity: .7; }
   
 </style>
 </head>
@@ -613,6 +625,18 @@
     </div>
   </div>
 </div>
+
+  <div class="confirm-backdrop" id="moveRoomBackdrop">
+  <div class="confirm-box">
+    <div class="confirm-title">병실 이동</div>
+    <div class="confirm-msg" style="margin-bottom:10px">이동할 병실을 선택하세요.</div>
+    <select id="moveRoomSelect" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;margin-bottom:16px;outline:none"></select>
+    <div class="confirm-btns">
+      <button class="btn-cc" onclick="closeMoveRoom()">취소</button>
+      <button class="btn-cd" style="background:var(--accent)" onclick="confirmMoveRoom()">이동</button>
+    </div>
+  </div>
+</div>
   
 <div class="toast" id="toast"></div>
 
@@ -753,6 +777,7 @@ function render() {
         <div class="card-actions">
           <button class="btn-del" onclick="askDel(${p.id})">삭제</button>
           <button class="btn-discharge" onclick="moveToDischarged(${p.id})">퇴원환자로 이동</button>
+          <button class="btn-move" onclick="openMoveRoom(${p.id})">병실이동</button>
           <button class="btn-edit" onclick="openSheet(${p.id})">수정</button>
         </div>
       </div>
@@ -847,6 +872,53 @@ function confirmDischarge() {
   }
   persist(); closeDischarge(); render();
   toast('퇴원환자로 이동되었습니다');
+}
+
+  let moveRoomTargetId = null;
+
+function openMoveRoom(id) {
+  moveRoomTargetId = id;
+  const select = document.getElementById('moveRoomSelect');
+  // 85w 병동의 대기 병실만 보여줌
+  const emptyRooms = all
+    .filter(p => p.ward === '85w' && (!p.name || p.type === '대기'))
+    .sort((a,b) => a.room.localeCompare(b.room));
+  if (!emptyRooms.length) {
+    alert('이동 가능한 빈 병실이 없습니다.');
+    return;
+  }
+  select.innerHTML = emptyRooms.map(p => `<option value="${p.room}">${p.room}</option>`).join('');
+  document.getElementById('moveRoomBackdrop').classList.add('open');
+}
+function closeMoveRoom() {
+  document.getElementById('moveRoomBackdrop').classList.remove('open');
+  moveRoomTargetId = null;
+}
+function confirmMoveRoom() {
+  const targetRoom = document.getElementById('moveRoomSelect').value;
+  const targetIdx = all.findIndex(p => p.ward === '85w' && p.room === targetRoom);
+  const sourceIdx = all.findIndex(p => p.id === moveRoomTargetId);
+
+  if (targetIdx < 0 || sourceIdx < 0) return;
+
+  // 대상 병실에 이미 환자가 있는지 재확인
+  if (all[targetIdx].name && all[targetIdx].type !== '대기') {
+    alert('환자가 있는 병실입니다.');
+    return;
+  }
+
+  pushHistory();
+  const sourcePatient = all[sourceIdx];
+  const targetRoomNum = all[targetIdx].room;
+  const sourceRoomNum = sourcePatient.room;
+
+  // 환자를 대상 병실로 이동
+  all[targetIdx] = { ...sourcePatient, room: targetRoomNum };
+  // 원래 병실은 대기로
+  all[sourceIdx] = { ...sourcePatient, type:'대기', room: sourceRoomNum, name:'', days:'', disease:'', note:'', admDate:'', doctor:'', discharge:'', deathNote:'' };
+
+  persist(); closeMoveRoom(); render();
+  toast(`${targetRoomNum} 병실로 이동되었습니다`);
 }
 
 function updateDate() {
