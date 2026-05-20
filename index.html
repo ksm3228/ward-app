@@ -673,7 +673,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY = 'wardApp_v1';
+const KEY = 'wardApp_v2';
 
   let history = [], historyIdx = -1;
 
@@ -768,7 +768,8 @@ function getEffectiveProgress(p) {
   if (p.progressNote === 'o') return 'o';
   const days = parseInt(p.days) || 0;
   if (days >= 3) return '-'; // 4일째부터 빨간색
-  return 'n'; // 3일까지 주황색
+  if (days > 0) return 'n'; // 1~3일 주황색
+  return 'n';
 }
 
 function quickToggle(e, id, field) {
