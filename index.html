@@ -162,7 +162,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.8)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.9)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -390,8 +390,8 @@ function render() {
   document.getElementById('sectionLabel').textContent = currentWard + ' 병동';
   const active = list.filter(p => p.name && p.type !== '대기').length;
   const admitted = list.filter(p => p.name && p.type !== '대기');
-  const careRed = admitted.filter(p => (!p.careConsult || p.careConsult === '-') && p.readmit !== '가정형/재입원').length;
-  const progRed = admitted.filter(p => getEffectiveProgress(p) === '-').length;
+  const careRed = currentWard === '85w' ? admitted.filter(p => (!p.careConsult || p.careConsult === '-') && p.readmit !== '가정형/재입원').length : 0;
+  const progRed = currentWard === '85w' ? admitted.filter(p => getEffectiveProgress(p) === '-').length : 0;
   const redTotal = careRed + progRed;
   document.getElementById('stat-total').textContent = list.length;
   document.getElementById('stat-active').textContent = active;
@@ -412,9 +412,11 @@ function render() {
         <span class="card-name">${p.name||'<span style="color:var(--text3);font-size:13px">대기</span>'}</span>
         ${!isWait?`
           <span class="mini-tag ${p.discharge?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')">퇴원</span>
+          ${p.ward==='85w'?`
           <span class="mini-tag ${p.deathNote?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')">임종</span>
           <span class="mini-tag ${p.readmit==='가정형/재입원'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')">돌봄</span>
           <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')">경과</span>
+          `:''}
           ${p.days?`<span class="card-days">${p.days}일</span>`:''}
         `:''}
         <span class="chevron" id="chev-${p.id}">⌄</span>
@@ -520,7 +522,7 @@ window.confirmMoveRoom = function() {
   if(all[targetIdx].name&&all[targetIdx].type!=='대기'){alert('환자가 있는 병실입니다.');return;}
   pushHistory();
   const sp=all[sourceIdx], tRoom=all[targetIdx].room, sRoom=sp.room;
-  all[targetIdx]={...sp,room:tRoom};
+  all[targetIdx]={...sp,room:tRoom,ward:currentWard};
   all[sourceIdx]={...sp,type:'대기',room:sRoom,name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''};
   persist(); window.closeMoveRoom(); render(); toast(`${tRoom} 병실로 이동되었습니다`);
 };
