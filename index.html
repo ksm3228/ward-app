@@ -670,12 +670,14 @@ function render() {
       </div>
       <div class="card-body" id="body-${p.id}">
         <div class="info-grid">
-          <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}\">${p.disease||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">특이사항</span><span class="info-val${!p.note?' muted':''}\">${p.note||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}\">${fmtDate(p.admDate)||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}\">${p.doctor||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">퇴원기록</span>${disHtml}</div>
           <div class="info-item"><span class="info-lbl">임종기록</span><span class="info-val${!p.deathNote?' muted':''}">${p.deathNote||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}\">${fmtDate(p.admDate)||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}\">${p.doctor||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}\">${p.disease||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">특이사항</span><span class="info-val${!p.note?' muted':''}\">${p.note||'-'}</span></div>
+          
+          
           
          
         </div>
