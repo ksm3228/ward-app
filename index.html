@@ -178,7 +178,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v5.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v5.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -218,7 +218,7 @@
       </div>
       <div class="form-row">
         <div class="form-group"><label>성명</label><input type="text" id="f_name" placeholder="홍길동"></div>
-        <div class="form-group"><label>재원일수</label><input type="number" id="f_days" placeholder="0" min="0" inputmode="numeric"></div>
+        <div class="form-group"><label>재원일수</label><input type="text" id="f_days" placeholder="자동계산" readonly style="background:var(--border);color:var(--text2);cursor:not-allowed""></div>
       </div>
       <div class="form-group"><label>퇴원기록</label><select id="f_discharge"><option value="">-</option><option value="퇴원O">퇴원O</option><option value="전원">전원</option></select></div>
       <div class="form-group"><label>임종기록</label><select id="f_deathNote"><option value="">-</option><option value="전원">전원</option><option value="임누">임누</option><option value="집">집</option><option value="가정형">가정형</option><option value="전동">전동</option><option value="X">X</option></select></div>
@@ -667,8 +667,9 @@ function updateEmptySelects() {
   ['f_type','f_doctor'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.classList.toggle('empty-select', !el.value);
-    el.addEventListener('change', () => el.classList.toggle('empty-select', !el.value));
+    const isEmpty = v => !v || v === '대기' || v === '-';
+    el.classList.toggle('empty-select', isEmpty(el.value));
+    el.addEventListener('change', () => el.classList.toggle('empty-select', isEmpty(el.value)));
   });
   ['f_admDate','f_name'].forEach(id => {
     const el = document.getElementById(id);
@@ -678,6 +679,19 @@ function updateEmptySelects() {
     el.addEventListener('change', update);
     el.addEventListener('input', update);
   });
+  const admDate = document.getElementById('f_admDate');
+  if (admDate) {
+    admDate.addEventListener('change', () => {
+      const daysEl = document.getElementById('f_days');
+      if (!daysEl || !admDate.value) return;
+      const adm = new Date(admDate.value);
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      adm.setHours(0,0,0,0);
+      const diff = Math.floor((now - adm) / (1000*60*60*24));
+      daysEl.value = diff >= 0 ? diff : 0;
+    });
+  }
 }
 
 let editMode = false;
