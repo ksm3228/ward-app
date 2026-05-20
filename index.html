@@ -167,7 +167,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.4)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.5)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -605,12 +605,15 @@ window.confirmMoveRoom = function() {
     }
     pushHistory();
     if (targetIdx >= 0) {
-      // 대상 병실이 목록에 있으면 → 대상은 환자 데이터로, 원본은 대기로
-      all[targetIdx] = { ...all[targetIdx], ...sp, id: all[targetIdx].id, room: inputRoom, ward: moveTargetWard };
+      // 대상 병실(대기)이 있으면 → 환자를 대상 id로 이동, 원본은 대기로
+      const targetId = all[targetIdx].id;
+      all[targetIdx] = { ...sp, id: targetId, room: inputRoom, ward: moveTargetWard };
       all[sourceIdx] = { ...sp, type:'대기', room:sRoom, ward:sWard, name:'', days:'', disease:'', note:'', admDate:'', doctor:'', discharge:'', deathNote:'', careConsult:'', progressNote:'n', readmit:'' };
     } else {
-      // 목록에 없는 병실 → 원본 데이터의 room/ward만 바꾸고 id 유지
+      // 목록에 없는 병실 → room/ward만 변경, id 유지, 중복 제거
       all[sourceIdx] = { ...sp, room: inputRoom, ward: moveTargetWard };
+      // 혹시 같은 room+ward 중복이 있으면 제거
+      all = all.filter((p, i) => i === sourceIdx || !(p.room === inputRoom && p.ward === moveTargetWard && p.id !== sp.id));
       all.sort((a,b) => a.ward.localeCompare(b.ward) || a.room.localeCompare(b.room));
     }
     persist(); window.closeMoveRoom(); render();
