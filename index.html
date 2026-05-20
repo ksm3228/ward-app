@@ -505,7 +505,11 @@
         </div>
         <div class="form-group">
           <label>담당의</label>
-          <input type="text" id="f_doctor" placeholder="의사명">
+          <select id="f_doctor">
+            <option value="">-</option>
+            <option value="김성민">김성민</option>
+            <option value="권기영">권기영</option>
+          </select>
         </div>
       </div>
       <div class="form-row">
@@ -715,7 +719,7 @@ function openSheet(id) {
     FIELDS.forEach(f => { const el = document.getElementById('f_' + f); if (el) el.value = ''; });
     document.getElementById('f_type').value = '대기';
     document.getElementById('f_admDate').value = today();
-    document.getElementById('f_doctor').value = '김성민';
+    document.getElementById('f_doctor').value = '';
   }
   document.getElementById('sheetBackdrop').classList.add('open');
   document.getElementById('f_room').focus();
