@@ -178,7 +178,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.7)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v5.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -670,12 +670,14 @@ function updateEmptySelects() {
     el.classList.toggle('empty-select', !el.value);
     el.addEventListener('change', () => el.classList.toggle('empty-select', !el.value));
   });
-  const admDate = document.getElementById('f_admDate');
-  if (admDate) {
-    const update = () => { admDate.style.background = admDate.value ? '' : '#fffbeb'; admDate.style.borderColor = admDate.value ? '' : '#f59e0b'; };
+  ['f_admDate','f_name'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const update = () => { el.style.background = el.value ? '' : '#fffbeb'; el.style.borderColor = el.value ? '' : '#f59e0b'; };
     update();
-    admDate.addEventListener('change', update);
-  }
+    el.addEventListener('change', update);
+    el.addEventListener('input', update);
+  });
 }
 
 let editMode = false;
