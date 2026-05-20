@@ -423,6 +423,10 @@
     pointer-events: none;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .badge-dr-kim { background: #e0f0ff; color: #1a5fa8; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; flex-shrink: 0; }
+  .badge-dr-kwon { background: #f0e8ff; color: #6b21a8; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; flex-shrink: 0; }
+  
 </style>
 </head>
 <body>
@@ -664,6 +668,7 @@ function render() {
     return `
     <div class="patient-card${isWait ? ' is-waiting' : ''}" id="card-${p.id}">
       <div class="card-header" onclick="toggleCard(${p.id})">
+        ${p.doctor === '김성민' ? '<span class="badge-dr-kim">김</span>' : p.doctor === '권기영' ? '<span class="badge-dr-kwon">권</span>' : ''}
         <span class="badge ${bc}">${bt}</span>
         <span class="card-room">${p.room}</span>
         <span class="card-name">${p.name || '<span style="color:var(--text3);font-size:13px">대기</span>'}</span>
