@@ -162,7 +162,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.9)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -508,23 +508,24 @@ window.confirmDischarge = function() {
 let moveRoomTargetId = null;
 window.openMoveRoom = function(id) {
   moveRoomTargetId=id;
-  const emptyRooms=all.filter(p=>p.ward===currentWard&&(!p.name||p.type==='대기')).sort((a,b)=>a.room.localeCompare(b.room));
+  const wards = ['85w','75w','65w'];
+  const emptyRooms=all.filter(p=>wards.includes(p.ward)&&(!p.name||p.type==='대기')).sort((a,b)=>a.ward.localeCompare(b.ward)||a.room.localeCompare(b.room));
   if(!emptyRooms.length){alert('이동 가능한 빈 병실이 없습니다.');return;}
-  document.getElementById('moveRoomSelect').innerHTML=emptyRooms.map(p=>`<option value="${p.room}">${p.room}</option>`).join('');
+  document.getElementById('moveRoomSelect').innerHTML=emptyRooms.map(p=>`<option value="${p.id}">[${p.ward}] ${p.room}</option>`).join('');
   document.getElementById('moveRoomBackdrop').classList.add('open');
 };
 window.closeMoveRoom = function() { document.getElementById('moveRoomBackdrop').classList.remove('open'); moveRoomTargetId=null; };
 window.confirmMoveRoom = function() {
-  const targetRoom=document.getElementById('moveRoomSelect').value;
-  const targetIdx=all.findIndex(p=>p.ward===currentWard&&p.room===targetRoom);
-  const sourceIdx=all.findIndex(p=>p.id===moveRoomTargetId);
+  const targetId = parseInt(document.getElementById('moveRoomSelect').value);
+  const targetIdx = all.findIndex(p=>p.id===targetId);
+  const sourceIdx = all.findIndex(p=>p.id===moveRoomTargetId);
   if(targetIdx<0||sourceIdx<0)return;
   if(all[targetIdx].name&&all[targetIdx].type!=='대기'){alert('환자가 있는 병실입니다.');return;}
   pushHistory();
-  const sp=all[sourceIdx], tRoom=all[targetIdx].room, sRoom=sp.room;
-  all[targetIdx]={...sp,room:tRoom,ward:currentWard};
-  all[sourceIdx]={...sp,type:'대기',room:sRoom,name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''};
-  persist(); window.closeMoveRoom(); render(); toast(`${tRoom} 병실로 이동되었습니다`);
+  const sp=all[sourceIdx], tRoom=all[targetIdx].room, tWard=all[targetIdx].ward, sRoom=sp.room, sWard=sp.ward;
+  all[targetIdx]={...sp,room:tRoom,ward:tWard};
+  all[sourceIdx]={...sp,type:'대기',room:sRoom,ward:sWard,name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''};
+  persist(); window.closeMoveRoom(); render(); toast(`[${tWard}] ${tRoom} 병실로 이동되었습니다`);
 };
 
 window.saveNote = function(id, value) {
