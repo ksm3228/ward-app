@@ -158,7 +158,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -205,7 +205,7 @@
         <div class="form-group"><label>돌봄상담</label><select id="f_careConsult"><option value="">-</option><option value="o">o</option></select></div>
         <div class="form-group"><label>경과기록</label><select id="f_progressNote"><option value="n">n</option><option value="o">o</option><option value="-">-</option></select></div>
       </div>
-      <div class="form-group"><label>재입원</label><select id="f_readmit"><option value="">-</option><option value="재입원o">재입원o</option></select></div>
+      <div class="form-group"><label>재입원</label><select id="f_readmit"><option value="">-</option><option value="가정형/재입원">가정형/재입원</option></select></div>
       <div class="form-group"><label>병명</label><input type="text" id="f_disease" placeholder="예) Rectal ca."></div>
       <div class="form-group"><label>특이사항</label><input type="text" id="f_note" placeholder="예) 장루, 낙상위험 등"></div>
       <div class="form-row">
@@ -406,7 +406,7 @@ function render() {
         ${!isWait?`
           <span class="mini-tag ${p.discharge?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')">퇴원</span>
           <span class="mini-tag ${p.deathNote?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')">임종</span>
-          <span class="mini-tag ${p.readmit==='재입원o'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')">돌봄</span>
+          <span class="mini-tag ${p.readmit==='가정형/재입원'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')">돌봄</span>
           <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')">경과</span>
           ${p.days?`<span class="card-days">${p.days}일</span>`:''}
         `:''}
