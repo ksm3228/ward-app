@@ -562,6 +562,23 @@
         </select>
       </div>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label>돌봄상담</label>
+          <select id="f_careConsult">
+            <option value="">-</option>
+            <option value="o">o</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>경과기록</label>
+          <select id="f_progressNote">
+            <option value="n">n</option>
+            <option value="o">o</option>
+          </select>
+        </div>
+      </div>
+
 
       
       <div class="form-group">
@@ -767,6 +784,8 @@ function render() {
         <div class="info-grid">
           <div class="info-item"><span class="info-lbl">퇴원기록</span>${disHtml}</div>
           <div class="info-item"><span class="info-lbl">임종기록</span><span class="info-val${!p.deathNote?' muted':''}">${p.deathNote||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">돌봄상담</span><span class="info-val${!p.careConsult?' muted':''}">${p.careConsult||'-'}</span></div>
+          <div class="info-item"><span class="info-lbl">경과기록</span><span class="info-val">${p.progressNote||'n'}</span></div>
           <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}\">${fmtDate(p.admDate)||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}\">${p.doctor||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}\">${p.disease||'-'}</span></div>
@@ -799,7 +818,7 @@ function selectWard(ward, btn) {
   render();
 }
 
-const FIELDS = ['room','type','name','days','disease','note','admDate','doctor','discharge','deathNote'];
+const FIELDS = ['room','type','name','days','disease','note','admDate','doctor','discharge','deathNote','careConsult','progressNote'];
 
 function openSheet(id) {
   document.getElementById('sheetTitle').textContent = id ? '환자 수정' : '환자 등록';
