@@ -162,7 +162,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.6)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.7)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -390,7 +390,7 @@ function render() {
   document.getElementById('sectionLabel').textContent = currentWard + ' 병동';
   const active = list.filter(p => p.name && p.type !== '대기').length;
   const admitted = list.filter(p => p.name && p.type !== '대기');
-  const careRed = admitted.filter(p => !p.careConsult || p.careConsult === '-').length;
+  const careRed = admitted.filter(p => (!p.careConsult || p.careConsult === '-') && p.readmit !== '가정형/재입원').length;
   const progRed = admitted.filter(p => getEffectiveProgress(p) === '-').length;
   const redTotal = careRed + progRed;
   document.getElementById('stat-total').textContent = list.length;
