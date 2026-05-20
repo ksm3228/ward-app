@@ -178,7 +178,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v5.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v5.3)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -220,8 +220,8 @@
         <div class="form-group"><label>성명</label><input type="text" id="f_name" placeholder="홍길동"></div>
         <div class="form-group"><label>재원일수</label><input type="text" id="f_days" placeholder="자동계산" readonly style="background:var(--border);color:var(--text2);cursor:not-allowed""></div>
       </div>
-      <div class="form-group"><label>퇴원기록</label><select id="f_discharge"><option value="">-</option><option value="퇴원O">퇴원O</option><option value="전원">전원</option></select></div>
-      <div class="form-group"><label>임종기록</label><select id="f_deathNote"><option value="">-</option><option value="전원">전원</option><option value="임누">임누</option><option value="집">집</option><option value="가정형">가정형</option><option value="전동">전동</option><option value="X">X</option></select></div>
+      <div class="form-group"><label>퇴원기록</label><select id="f_discharge"><option value="">-</option><option value="퇴원기록">퇴원기록</option></select></div>
+      <div class="form-group"><label>임종기록</label><select id="f_deathNote"><option value="">-</option><option value="전원">전원</option><option value="임종기록">임종기록</option><option value="집">집</option></select></div>
       <div class="form-row">
         <div class="form-group"><label>돌봄상담</label><select id="f_careConsult"><option value="">-</option><option value="o">o</option></select></div>
         <div class="form-group"><label>경과기록</label><select id="f_progressNote"><option value="n">n</option><option value="o">o</option><option value="-">-</option></select></div>
@@ -505,8 +505,8 @@ window.quickToggle = function(e, id, field) {
   const idx = all.findIndex(x => x.id === id);
   if (idx < 0) return;
   pushHistory();
-  if (field === 'discharge') { const o=['','퇴원O','전원']; all[idx].discharge=o[(o.indexOf(all[idx].discharge)+1)%o.length]; }
-  else if (field === 'deathNote') { const o=['','전원','임누','집','가정형','전동','X']; all[idx].deathNote=o[(o.indexOf(all[idx].deathNote)+1)%o.length]; }
+  if (field === 'discharge') { const o=['','퇴원기록']; all[idx].discharge=o[(o.indexOf(all[idx].discharge)+1)%o.length]; }
+  else if (field === 'deathNote') { const o=['','전원','임종기록','집']; all[idx].deathNote=o[(o.indexOf(all[idx].deathNote)+1)%o.length]; }
   else if (field === 'careConsult') { all[idx].careConsult = all[idx].careConsult==='o'?'':'o'; }
   else if (field === 'progressNote') { all[idx].progressNote = getEffectiveProgress(all[idx])==='o'?'n':'o'; }
   persist(); render();
