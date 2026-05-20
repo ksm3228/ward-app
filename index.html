@@ -582,8 +582,8 @@
 
 <div class="confirm-backdrop" id="confirmBackdrop">
   <div class="confirm-box">
-    <div class="confirm-title">환자 삭제</div>
-    <div class="confirm-msg">이 환자 기록을 삭제할까요?<br>삭제 후 복구할 수 없습니다.</div>
+    <div class="confirm-title">병실 변경</div>
+    <div class="confirm-msg">대기 병실로 변경합니다.</div>
     <div class="confirm-btns">
       <button class="btn-cc" onclick="closeConfirm()">취소</button>
       <button class="btn-cd" onclick="confirmDelete()">삭제</button>
@@ -797,9 +797,12 @@ function askDel(id) { delId = id; document.getElementById('confirmBackdrop').cla
 function closeConfirm() { document.getElementById('confirmBackdrop').classList.remove('open'); delId = null; }
 function confirmDelete() {
   pushHistory();
-  all = all.filter(x => x.id !== delId);
+  const idx = all.findIndex(x => x.id === delId);
+  if (idx >= 0) {
+    all[idx] = { ...all[idx], type:'대기', name:'', days:'', disease:'', note:'', admDate:'', doctor:'', discharge:'', deathNote:'' };
+  }
   persist(); closeConfirm(); render();
-  toast('삭제되었습니다');
+  toast('대기 병실로 변경되었습니다');
 }
 
 function updateDate() {
