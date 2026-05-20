@@ -663,12 +663,8 @@ function render() {
           <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}\">${fmtDate(p.admDate)||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}\">${p.doctor||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">퇴원구분</span>${disHtml}</div>
-          <div class="info-item"><span class="info-lbl">퇴원예정일</span><span class="info-val${!p.disDate?' muted':''}\">${fmtDate(p.disDate)||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">수술확인</span>${surHtml}</div>
-          <div class="info-item"><span class="info-lbl">다음예정</span><span class="info-val${!p.next?' muted':''}\">${fmtDate(p.next)||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">차트번호</span><span class="info-val${!p.chart?' muted':''}\">${p.chart||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">담당간호사</span><span class="info-val${!p.nurse?' muted':''}\">${p.nurse||'-'}</span></div>
-          ${p.remark ? `<div class="info-item full"><span class="info-lbl">비고</span><span class="info-val">${p.remark}</span></div>` : ''}
+         
         </div>
         <div class="card-actions">
           <button class="btn-del" onclick="askDel(${p.id})">삭제</button>
@@ -693,7 +689,7 @@ function selectWard(ward, btn) {
   render();
 }
 
-const FIELDS = ['room','type','name','days','disease','note','admDate','doctor','discharge','disDate','chart','nurse','surgery','next','remark'];
+const FIELDS = ['room','type','name','days','disease','note','admDate','doctor','discharge','chart'];
 
 function openSheet(id) {
   document.getElementById('sheetTitle').textContent = id ? '환자 수정' : '환자 등록';
