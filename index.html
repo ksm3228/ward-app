@@ -603,6 +603,17 @@
   </div>
 </div>
 
+<div class="confirm-backdrop" id="dischargeBackdrop">
+  <div class="confirm-box">
+    <div class="confirm-title">퇴원환자 이동</div>
+    <div class="confirm-msg">퇴원환자 탭으로 이동합니다.</div>
+    <div class="confirm-btns">
+      <button class="btn-cc" onclick="closeDischarge()">취소</button>
+      <button class="btn-cd" style="background:var(--success)" onclick="confirmDischarge()">이동</button>
+    </div>
+  </div>
+</div>
+  
 <div class="toast" id="toast"></div>
 
 <script>
@@ -816,19 +827,27 @@ function confirmDelete() {
   toast('대기 병실로 변경되었습니다');
 }
 
+let dischargeTargetId = null;
+
 function moveToDischarged(id) {
+  dischargeTargetId = id;
+  document.getElementById('dischargeBackdrop').classList.add('open');
+}
+function closeDischarge() {
+  document.getElementById('dischargeBackdrop').classList.remove('open');
+  dischargeTargetId = null;
+}
+function confirmDischarge() {
   pushHistory();
-  const idx = all.findIndex(x => x.id === id);
+  const idx = all.findIndex(x => x.id === dischargeTargetId);
   if (idx >= 0) {
     const p = all[idx];
-    // 퇴원환자 탭에 복사본 추가
     all.push({ ...p, id: nid++, ward: '퇴원환자' });
-    // 원래 병실은 대기로 전환
     all[idx] = { ...p, type:'대기', name:'', days:'', disease:'', note:'', admDate:'', doctor:'', discharge:'', deathNote:'' };
   }
-  persist(); render();
+  persist(); closeDischarge(); render();
   toast('퇴원환자로 이동되었습니다');
-}  
+}
 
 function updateDate() {
   const d = new Date();
