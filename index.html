@@ -464,6 +464,23 @@
     cursor: pointer;
   }
   .btn-move:active { opacity: .7; }
+
+  .mini-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .mini-red { background: var(--danger-bg); color: var(--danger-text); border: 0.5px solid var(--danger); }
+  .mini-green { background: var(--success-bg); color: var(--success-text); border: 0.5px solid var(--success); }
+  .mini-pink { background: #fff0f3; color: #c2185b; border: 0.5px solid #f48fb1; }
+  .mini-warn { background: #fff8e1; color: #f57f17; border: 0.5px solid #ffcc02; }
   
 </style>
 </head>
@@ -742,6 +759,48 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2000);
 }
 
+function getProgressClass(p) {
+  const prog = getEffectiveProgress(p);
+  if (prog === 'o') return 'mini-green';
+  if (prog === '-') return 'mini-red';
+  return 'mini-pink'; // 'n'
+}
+
+function getEffectiveProgress(p) {
+  // 입원 후 3일 이상이면 자동으로 '-'
+  if (p.progressNote === 'o') return 'o';
+  if (p.admDate) {
+    const adm = new Date(p.admDate);
+    const today = new Date();
+    const diff = Math.floor((today - adm) / (1000 * 60 * 60 * 24));
+    if (diff >= 3) return '-';
+  }
+  return p.progressNote || 'n';
+}
+
+function quickToggle(e, id, field) {
+  e.stopPropagation();
+  const idx = all.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  pushHistory();
+
+  if (field === 'discharge') {
+    const opts = ['', '퇴원X', '퇴원O', '전원'];
+    const cur = opts.indexOf(all[idx].discharge);
+    all[idx].discharge = opts[(cur + 1) % opts.length];
+  } else if (field === 'deathNote') {
+    const opts = ['', '임종기록', '전원', '임누', '집', '가정형', '전동', 'X'];
+    const cur = opts.indexOf(all[idx].deathNote);
+    all[idx].deathNote = opts[(cur + 1) % opts.length];
+  } else if (field === 'careConsult') {
+    all[idx].careConsult = all[idx].careConsult === 'o' ? '' : 'o';
+  } else if (field === 'progressNote') {
+    all[idx].progressNote = all[idx].progressNote === 'o' ? 'n' : 'o';
+  }
+
+  persist(); render();
+}
+  
 function render() {
   const list = all.filter(p => p.ward === currentWard).sort((a,b) => a.room.localeCompare(b.room));
   document.getElementById('sectionLabel').textContent = currentWard + ' 병동';
@@ -778,6 +837,12 @@ function render() {
         <span class="card-room">${p.room}</span>
         <span class="card-name">${p.name || '<span style="color:var(--text3);font-size:13px">대기</span>'}</span>
         ${p.days ? `<span class="card-days">${p.days}일</span>` : ''}
+        ${!isWait ? `
+          <span class="mini-tag ${p.discharge && p.discharge !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')" title="퇴원">퇴원</span>
+          <span class="mini-tag ${p.deathNote && p.deathNote !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')" title="임종">임종</span>
+          <span class="mini-tag ${p.careConsult && p.careConsult !== '-' ? 'mini-green' : 'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')" title="돌봄">돌봄</span>
+          <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')" title="경과">경과</span>
+        ` : ''}
         <span class="chevron" id="chev-${p.id}">⌄</span>
       </div>
       <div class="card-body" id="body-${p.id}">
