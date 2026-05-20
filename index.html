@@ -544,10 +544,7 @@
       </div>
       
       <div class="form-row">
-        <div class="form-group">
-          <label>차트번호</label>
-          <input type="text" id="f_chart" placeholder="850204">
-        </div>
+
         
       </div>
       <div class="form-row">
@@ -679,7 +676,7 @@ function render() {
           <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}\">${p.doctor||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">퇴원기록</span>${disHtml}</div>
           <div class="info-item"><span class="info-lbl">임종기록</span><span class="info-val${!p.deathNote?' muted':''}">${p.deathNote||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">차트번호</span><span class="info-val${!p.chart?' muted':''}\">${p.chart||'-'}</span></div>
+          
          
         </div>
         <div class="card-actions">
@@ -705,7 +702,7 @@ function selectWard(ward, btn) {
   render();
 }
 
-const FIELDS = ['room','type','name','days','disease','note','admDate','doctor','discharge','deathNote','chart'];
+const FIELDS = ['room','type','name','days','disease','note','admDate','doctor','discharge','deathNote'];
 
 function openSheet(id) {
   document.getElementById('sheetTitle').textContent = id ? '환자 수정' : '환자 등록';
