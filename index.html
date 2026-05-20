@@ -490,7 +490,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v2.5)</span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v2.6)</span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -858,7 +858,7 @@ function render() {
           <div class="info-item"><span class="info-lbl">돌봄상담</span><span class="info-val${!p.careConsult?' muted':''}">${p.careConsult||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">경과기록</span><span class="info-val">${getEffectiveProgress(p)}</span></div>
           <div class="info-item"><span class="info-lbl">재입원</span><span class="info-val${!p.readmit?' muted':''}">${p.readmit||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">입원일</span>
+          <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}\">${fmtDate(p.admDate)||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}\">${p.doctor||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}\">${p.disease||'-'}</span></div>
           <div class="info-item"><span class="info-lbl">특이사항</span><span class="info-val${!p.note?' muted':''}\">${p.note||'-'}</span></div>
