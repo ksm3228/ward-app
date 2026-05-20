@@ -150,7 +150,12 @@
 
   .inline-edit { width:100%; background:var(--surface2); border:0.5px solid var(--border2); border-radius:var(--radius-sm); padding:6px 10px; font-size:13px; color:var(--text); font-family:inherit; outline:none; }
   .inline-edit:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(37,99,235,.15); }
-  
+
+  .form-group input:placeholder-shown,
+  .form-group select.empty-select {
+    background: #fffbeb;
+    border-color: #f59e0b;
+  }
 </style>
 </head>
 <body>
@@ -162,7 +167,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.3)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.4)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -494,6 +499,7 @@ window.openSheet = function(id) {
   if (id) { const p = all.find(x => x.id===id); FIELDS.forEach(f => { const el=document.getElementById('f_'+f); if(el) el.value=p[f]||''; }); }
   else { FIELDS.forEach(f => { const el=document.getElementById('f_'+f); if(el) el.value=''; }); document.getElementById('f_type').value='대기'; document.getElementById('f_admDate').value=today(); }
   document.getElementById('sheetBackdrop').classList.add('open');
+  updateEmptySelects();
 };
 window.closeSheet = function() { document.getElementById('sheetBackdrop').classList.remove('open'); };
 window.onBackdropClick = function(e) { if(e.target===document.getElementById('sheetBackdrop')) window.closeSheet(); };
@@ -633,6 +639,21 @@ window.saveNote = function(id, value) {
   persist();
   toast('특이사항 저장됨');
 };
+
+function updateEmptySelects() {
+  ['f_type','f_doctor'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('empty-select', !el.value);
+    if (el) el.addEventListener('change', () => el.classList.toggle('empty-select', !el.value));
+  });
+  ['f_room','f_name','f_admDate'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      el.style.background = el.value ? '' : '#fffbeb';
+      el.style.borderColor = el.value ? '' : '#f59e0b';
+    });
+  });
+}
   
 function updateDate() {
   const d=new Date();
