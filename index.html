@@ -162,7 +162,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v4.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -599,14 +599,14 @@ window.confirmMoveRoom = function() {
     }
     pushHistory();
     if (targetIdx >= 0) {
-      // 기존 병실 있으면 교체
-      all[targetIdx] = { ...sp, room: inputRoom, ward: moveTargetWard };
+      // 대상 병실이 목록에 있으면 → 대상은 환자 데이터로, 원본은 대기로
+      all[targetIdx] = { ...all[targetIdx], ...sp, id: all[targetIdx].id, room: inputRoom, ward: moveTargetWard };
+      all[sourceIdx] = { ...sp, type:'대기', room:sRoom, ward:sWard, name:'', days:'', disease:'', note:'', admDate:'', doctor:'', discharge:'', deathNote:'', careConsult:'', progressNote:'n', readmit:'' };
     } else {
-      // 목록에 없는 병실이면 새로 추가
-      all.push({ ...sp, room: inputRoom, ward: moveTargetWard });
+      // 목록에 없는 병실 → 원본 데이터의 room/ward만 바꾸고 id 유지
+      all[sourceIdx] = { ...sp, room: inputRoom, ward: moveTargetWard };
+      all.sort((a,b) => a.ward.localeCompare(b.ward) || a.room.localeCompare(b.room));
     }
-    all[sourceIdx] = { ...sp, type:'대기', room:sRoom, ward:sWard, name:'', days:'', disease:'', note:'', admDate:'', doctor:'', discharge:'', deathNote:'', careConsult:'', progressNote:'n', readmit:'' };
-    all.sort((a,b) => a.ward.localeCompare(b.ward) || a.room.localeCompare(b.room));
     persist(); window.closeMoveRoom(); render();
     toast(`[${moveTargetWard}] ${inputRoom} 병실로 이동되었습니다`);
   } else {
