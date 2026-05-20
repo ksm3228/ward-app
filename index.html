@@ -560,7 +560,6 @@
         <label>퇴원기록</label>
         <select id="f_discharge">
           <option value="">-</option>
-          <option value="퇴원X">퇴원X</option>
           <option value="퇴원O">퇴원O</option>
         </select>
       </div>
@@ -575,7 +574,6 @@
           <option value="집">집</option>
           <option value="가정형">가정형</option>
           <option value="전동">전동</option>
-          <option value="임종기록x">임종기록x</option>
         </select>
       </div>
 
@@ -785,11 +783,11 @@ function quickToggle(e, id, field) {
   pushHistory();
 
   if (field === 'discharge') {
-    const opts = ['', '퇴원X', '퇴원O', '전원'];
+    const opts = ['', '퇴원O', '전원'];
     const cur = opts.indexOf(all[idx].discharge);
     all[idx].discharge = opts[(cur + 1) % opts.length];
   } else if (field === 'deathNote') {
-    const opts = ['', '임종기록', '전원', '임누', '집', '가정형', '전동', 'X'];
+    const opts = ['', '전원', '임누', '집', '가정형', '전동', 'X'];
     const cur = opts.indexOf(all[idx].deathNote);
     all[idx].deathNote = opts[(cur + 1) % opts.length];
   } else if (field === 'careConsult') {
