@@ -490,7 +490,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v2.6)</span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v2.7)</span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -747,8 +747,19 @@ const SAMPLE = [
 ];
 
 function load() {
-  try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : JSON.parse(JSON.stringify(SAMPLE)); }
-  catch(e) { return JSON.parse(JSON.stringify(SAMPLE)); }
+  try {
+    const r = localStorage.getItem(KEY);
+    if (!r) return JSON.parse(JSON.stringify(SAMPLE));
+    const data = JSON.parse(r);
+    if (!Array.isArray(data) || data.length === 0) return JSON.parse(JSON.stringify(SAMPLE));
+    // 기존 데이터에 누락된 필드 기본값 보완
+    return data.map(p => ({
+      careConsult: '', progressNote: 'n', deathNote: '', readmit: '',
+      ...p
+    }));
+  } catch(e) {
+    return JSON.parse(JSON.stringify(SAMPLE));
+  }
 }
 function persist() {
   try { localStorage.setItem(KEY, JSON.stringify(all)); } catch(e) {}
