@@ -162,7 +162,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.7)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v3.8)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -182,7 +182,7 @@
 <div class="stats-row">
   <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">전체 병상</div></div>
   <div class="stat-card"><div class="stat-num stat-active" id="stat-active">0</div><div class="stat-lbl">입원 중</div></div>
-  <div class="stat-card"><div class="stat-num stat-wait" id="stat-wait">0</div><div class="stat-lbl">돌봄·경과 미비</div></div>
+  <div class="stat-card"><div class="stat-num stat-active" style="color:var(--danger)" id="stat-wait">0</div><div class="stat-lbl">돌봄·경과 미비</div></div>
 </div>
 
 <div class="section-label" id="sectionLabel">85w 병동</div>
