@@ -765,13 +765,13 @@ function getProgressClass(p) {
 }
 
 function getEffectiveProgress(p) {
-  // 입원 후 3일 이상이면 자동으로 '-'
   if (p.progressNote === 'o') return 'o';
   if (p.admDate) {
     const adm = new Date(p.admDate);
     const today = new Date();
     const diff = Math.floor((today - adm) / (1000 * 60 * 60 * 24));
-    if (diff >= 3) return '-';
+    if (diff >= 3) return '-'; // 4일째부터 빨간색
+    return 'n'; // 3일까지 주황색
   }
   return p.progressNote || 'n';
 }
