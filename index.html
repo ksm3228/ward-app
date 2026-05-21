@@ -178,7 +178,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v6.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v6.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -221,7 +221,7 @@
         <div class="form-group"><label>재원일수</label><input type="text" id="f_days" placeholder="자동계산" readonly style="background:var(--border);color:var(--text2);cursor:not-allowed""></div>
       </div>
       <div class="form-group"><label>퇴원기록</label><select id="f_discharge"><option value="">-</option><option value="퇴원기록">퇴원기록</option></select></div>
-      <div class="form-group"><label>임종기록</label><select id="f_deathNote"><option value="">-</option><option value="전원">전원</option><option value="임종기록">임종기록</option><option value="집">집</option></select></div>
+      <div class="form-group"><label>임종기록</label><select id="f_deathNote"><option value="">-</option><option value="임종기록">임종기록</option><option value="임종 이외">임종 이외</option></select></div>
       <div class="form-row">
         <div class="form-group"><label>돌봄상담</label><select id="f_careConsult"><option value="">-</option><option value="o">o</option></select></div>
         <div class="form-group"><label>경과기록</label><select id="f_progressNote"><option value="n">n</option><option value="o">o</option><option value="-">-</option></select></div>
@@ -477,9 +477,8 @@ function render() {
           <div class="info-item"><span class="info-lbl">임종기록</span>
             <select class="inline-edit" onchange="saveDeathNote(${p.id},this.value)" onclick="event.stopPropagation()" style="padding:4px 8px;font-size:13px">
               <option value="" ${!p.deathNote?'selected':''}>-</option>
-              <option value="전원" ${p.deathNote==='전원'?'selected':''}>전원</option>
               <option value="임종기록" ${p.deathNote==='임종기록'?'selected':''}>임종기록</option>
-              <option value="집" ${p.deathNote==='집'?'selected':''}>집</option>
+              <option value="임종 이외" ${p.deathNote==='임종 이외'?'selected':''}>임종 이외</option>
             </select>
           </div>
           <div class="info-item"><span class="info-lbl">돌봄상담</span><span class="info-val${!p.careConsult?' muted':''}">${p.careConsult||'-'}</span></div>
@@ -524,7 +523,7 @@ window.quickToggle = function(e, id, field) {
   if (idx < 0) return;
   pushHistory();
   if (field === 'discharge') { const o=['','퇴원기록']; all[idx].discharge=o[(o.indexOf(all[idx].discharge)+1)%o.length]; }
-  else if (field === 'deathNote') { const o=['','임종기록','전원','집']; all[idx].deathNote=o[(o.indexOf(all[idx].deathNote)+1)%o.length]; }
+  else if (field === 'deathNote') { const o=['','임종기록','임종 이외']; all[idx].deathNote=o[(o.indexOf(all[idx].deathNote)+1)%o.length]; }
   else if (field === 'careConsult') { all[idx].careConsult = all[idx].careConsult==='o'?'':'o'; }
   else if (field === 'progressNote') { all[idx].progressNote = getEffectiveProgress(all[idx])==='o'?'n':'o'; }
   persist(); render();
