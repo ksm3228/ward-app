@@ -178,7 +178,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v6.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v6.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -524,7 +524,7 @@ window.quickToggle = function(e, id, field) {
   if (idx < 0) return;
   pushHistory();
   if (field === 'discharge') { const o=['','퇴원기록']; all[idx].discharge=o[(o.indexOf(all[idx].discharge)+1)%o.length]; }
-  else if (field === 'deathNote') { const o=['','전원','임종기록','집']; all[idx].deathNote=o[(o.indexOf(all[idx].deathNote)+1)%o.length]; }
+  else if (field === 'deathNote') { const o=['','임종기록','전원','집']; all[idx].deathNote=o[(o.indexOf(all[idx].deathNote)+1)%o.length]; }
   else if (field === 'careConsult') { all[idx].careConsult = all[idx].careConsult==='o'?'':'o'; }
   else if (field === 'progressNote') { all[idx].progressNote = getEffectiveProgress(all[idx])==='o'?'n':'o'; }
   persist(); render();
