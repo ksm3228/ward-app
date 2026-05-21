@@ -61,7 +61,7 @@
   .ward-tabs::-webkit-scrollbar { display: none; }
   .tab { padding: 6px 16px; border-radius: 20px; border: 0.5px solid var(--border2); font-size: 13px; font-weight: 500; cursor: pointer; background: var(--surface); color: var(--text2); white-space: nowrap; transition: all .15s; }
   .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px; position: sticky; top: var(--app-bar-height, 88px); z-index: 29; background: var(--bg); }
   .stat-card { background: var(--surface); border-radius: var(--radius-md); padding: 12px 10px; text-align: center; border: 0.5px solid var(--border); }
   .stat-num { font-size: 24px; font-weight: 600; line-height: 1; }
   .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 4px; }
@@ -178,7 +178,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v6.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v7.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -766,6 +766,13 @@ function deleteSelected() {
   toast(`${selectedIds.size === 0 ? '삭제되었습니다' : ''}`);
   toast('삭제되었습니다');
 }
+
+function updateAppBarHeight() {
+  const bar = document.querySelector('.app-bar');
+  if (bar) document.documentElement.style.setProperty('--app-bar-height', bar.offsetHeight + 'px');
+}
+updateAppBarHeight();
+window.addEventListener('resize', updateAppBarHeight);
   
 function updateDate() {
   const d=new Date();
