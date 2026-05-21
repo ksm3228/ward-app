@@ -178,7 +178,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v5.3)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v5.4)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -411,10 +411,21 @@ window.toast = function(msg) {
   setTimeout(() => el.classList.remove('show'), 2000);
 };
 
+function calcDays(p) {
+  if (p.admDate) {
+    const adm = new Date(p.admDate);
+    const now = new Date();
+    adm.setHours(0,0,0,0); now.setHours(0,0,0,0);
+    const diff = Math.floor((now - adm) / (1000*60*60*24)) + 1;
+    return diff >= 1 ? diff : 1;
+  }
+  return parseInt(p.days) || 0;
+}
+
 function getEffectiveProgress(p) {
   if (p.progressNote === 'o') return 'o';
   if (p.progressNote === '-') return '-';
-  const days = parseInt(p.days) || 0;
+  const days = calcDays(p);
   return days > 3 ? '-' : 'n';
 }
 function getProgressClass(p) {
@@ -456,7 +467,7 @@ function render() {
           <span class="mini-tag ${p.readmit==='가정형/재입원'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')">돌봄</span>
           <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')">경과</span>
           `:''}
-          ${p.days?`<span class="card-days">${p.days}일</span>`:''}
+          ${(p.admDate||p.days)?`<span class="card-days">${calcDays(p)}일</span>`:''}
         `:''}
         ${editMode ? `<span class="check-box" onclick="toggleSelectCard(event,${p.id})">${selectedIds.has(p.id)?'✓':''}</span>` : `<span class="chevron" id="chev-${p.id}">⌄</span>`}
       </div>
