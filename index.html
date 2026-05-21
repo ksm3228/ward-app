@@ -178,7 +178,7 @@
 
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v7.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v7.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -196,10 +196,11 @@
   </div>
 </div>
 
-<div class="stats-row">
+<div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
   <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">전체 병상</div></div>
   <div class="stat-card"><div class="stat-num stat-active" id="stat-active">0</div><div class="stat-lbl">입원 중</div></div>
   <div class="stat-card"><div class="stat-num stat-active" style="color:var(--danger)" id="stat-wait">0</div><div class="stat-lbl">돌봄·경과 미비</div></div>
+  <div class="stat-card"><div class="stat-num" style="color:#1d4ed8;background:var(--accent-bg);border-radius:var(--radius-sm);padding:2px 8px;display:inline-block" id="stat-pending">0</div><div class="stat-lbl">향후 작성 대기</div></div>
 </div>
 
 <div class="section-label" id="sectionLabel">85w 병동</div>
@@ -443,9 +444,11 @@ function render() {
   const careRed = currentWard === '85w' ? admitted.filter(p => (!p.careConsult || p.careConsult === '-') && p.readmit !== '가정형/재입원').length : 0;
   const progRed = currentWard === '85w' ? admitted.filter(p => getEffectiveProgress(p) === '-').length : 0;
   const redTotal = careRed + progRed;
+  const pendingBlue = admitted.filter(p => getEffectiveProgress(p) === 'n').length;
   document.getElementById('stat-total').textContent = list.length;
   document.getElementById('stat-active').textContent = active;
   document.getElementById('stat-wait').textContent = redTotal;
+  document.getElementById('stat-pending').textContent = pendingBlue;
   const el = document.getElementById('patientList');
   if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>'; return; }
   el.innerHTML = list.map(p => {
