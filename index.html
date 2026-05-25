@@ -191,7 +191,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -338,7 +338,7 @@ const db = getDatabase(app);
 const dbRef = ref(db, 'patients');
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-const ALLOWED_EMAIL = 'kimsungmin83@gmail.com';
+const ALLOWED_EMAILS = ['kimsungmin83@gmail.com', '새___이메일@gmail.com', '또___다른____이메일@gmail.com'];
 
 // 로그인 화면
 function showLoginScreen() {
@@ -355,7 +355,7 @@ window.googleLogin = async function() {
   try {
     const result = await signInWithPopup(auth, provider);
     const email = result.user.email;
-    if (email !== ALLOWED_EMAIL) {
+    if (!ALLOWED_EMAILS.includes(email)) {
       await signOut(auth);
       alert('접근 권한이 없습니다.\n허용된 계정으로 로그인하세요.');
     }
@@ -370,7 +370,7 @@ window.googleLogout = async function() {
 
 onAuthStateChanged(auth, (user) => {
   document.getElementById('loadingOverlay').style.display = 'none';
-  if (user && user.email === ALLOWED_EMAIL) {
+  if (user && ALLOWED_EMAILS.includes(user.email)) {
     showApp();
     // Firebase 데이터 연결
     onValue(dbRef, (snapshot) => {
