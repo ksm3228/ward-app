@@ -171,20 +171,34 @@
 </head>
 <body>
 
+<!-- 로그인 화면 -->
+<div id="loginScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+  <div style="font-size:40px">🏥</div>
+  <div style="font-size:20px;font-weight:600;color:var(--text)">병동 환자 관리</div>
+  <div style="font-size:13px;color:var(--text2)">허용된 계정으로만 접속 가능합니다</div>
+  <button onclick="googleLogin()" style="display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:var(--radius-md);border:0.5px solid var(--border2);background:var(--surface);color:var(--text);font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1)">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20">
+    Google로 로그인
+  </button>
+</div>
+  
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
   <div class="loading-text">데이터 불러오는 중...</div>
 </div>
 
+
+<div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v8.4)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
         <button class="btn-history" id="btn-redo" onclick="redo()" title="앞으로" disabled>↪</button>
       </div>
       <span id="dateDisplay" style="font-size:12px;color:var(--text2)"></span>
+      <button onclick="googleLogout()" style="font-size:11px;color:var(--text3);background:none;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:3px 8px;cursor:pointer">로그아웃</button>
       <button class="btn-ward-edit" id="btnWardEdit" onclick="toggleEditMode()" style="display:none">편집</button>
     </div>
   </div>
@@ -302,9 +316,12 @@
 
 <div class="toast" id="toast"></div>
 
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC9k6iGUcNObjxQGtlVOuP5_YSpErT9DtA",
@@ -319,6 +336,60 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const dbRef = ref(db, 'patients');
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+const ALLOWED_EMAIL = 'kimsungmin83@gmail.com';
+
+// 로그인 화면
+function showLoginScreen() {
+  document.getElementById('loadingOverlay').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appContent').style.display = 'none';
+}
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+}
+
+window.googleLogin = async function() {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const email = result.user.email;
+    if (email !== ALLOWED_EMAIL) {
+      await signOut(auth);
+      alert('접근 권한이 없습니다.\n허용된 계정으로 로그인하세요.');
+    }
+  } catch(e) {
+    alert('로그인 실패: ' + e.message);
+  }
+};
+
+window.googleLogout = async function() {
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, (user) => {
+  if (user && user.email === ALLOWED_EMAIL) {
+    showApp();
+    // Firebase 데이터 연결
+    onValue(dbRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data && Array.isArray(data)) {
+        all = data.map(p => ({ careConsult:'', progressNote:'n', deathNote:'', readmit:'', ...p }));
+      } else if (!data) {
+        all = JSON.parse(JSON.stringify(SAMPLE));
+        set(dbRef, all);
+      }
+      setSyncDot('connected');
+      render();
+    }, () => {
+      setSyncDot('');
+      toast('Firebase 연결 실패');
+    });
+  } else {
+    showLoginScreen();
+  }
+});
 
 function setSyncDot(state) {
   const dot = document.getElementById('syncDot');
@@ -366,22 +437,7 @@ async function persist() {
   catch(e) { setSyncDot(''); toast('저장 실패 - 네트워크 확인'); }
 }
 
-onValue(dbRef, (snapshot) => {
-  const data = snapshot.val();
-  if (data && Array.isArray(data)) {
-    all = data.map(p => ({ careConsult:'', progressNote:'n', deathNote:'', readmit:'', ...p }));
-  } else if (!data) {
-    all = JSON.parse(JSON.stringify(SAMPLE));
-    set(dbRef, all);
-  }
-  setSyncDot('connected');
-  document.getElementById('loadingOverlay').style.display = 'none';
-  render();
-}, () => {
-  setSyncDot('');
-  document.getElementById('loadingOverlay').style.display = 'none';
-  toast('Firebase 연결 실패');
-});
+
 
 function pushHistory() {
   historyStack = historyStack.slice(0, historyIdx + 1);
