@@ -191,7 +191,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.4)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.5)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -501,8 +501,9 @@ function renderCard(p) {
   const bc = p.type === '성인남' ? 'badge-m' : p.type === '성인여' ? 'badge-f' : 'badge-wait';
   const bt = p.type === '성인남' ? '남' : p.type === '성인여' ? '여' : '대기';
   const disHtml = p.discharge ? `<span class="chip chip-green">${p.discharge}</span>` : '<span class="info-val muted">-</span>';
+  const isToday = !isWait && calcDays(p) === 1;
   return `
-  <div class="patient-card${isWait?' is-waiting':''}" id="card-${p.id}" style="border-radius:0;border:none;border-bottom:0.5px solid var(--border);margin-bottom:0">
+  <div class="patient-card${isWait?' is-waiting':''}" id="card-${p.id}" style="border-radius:0;border:none;border-bottom:0.5px solid var(--border);margin-bottom:0${isToday?';background:#fffde7':''}">
     <div class="card-header" onclick="${editMode?`toggleSelectCard(event,${p.id})`:`toggleCard(${p.id})`}">
       ${p.doctor==='김성민'?'<span class="badge-dr-kim">김</span>':p.doctor==='권기영'?'<span class="badge-dr-kwon">권</span>':''}
       <span class="badge ${bc}">${bt}</span>
