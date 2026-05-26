@@ -191,7 +191,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.3)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -231,7 +231,8 @@
       <input type="hidden" id="f_id">
       <div class="form-row">
         <div class="form-group"><label>병실번호 *</label><input type="text" id="f_room" placeholder="850101" inputmode="numeric"></div>
-        <div class="form-group"><label>성별 선택</label><select id="f_type"><option value="대기">대기</option><option value="성인남">성인(남)</option><option value="성인여">성인(여)</option></select></div>
+        <div class="form-group"><label>성별 선택</label>
+          <select id="f_type"><option value="">성별</option><option value="대기">대기</option><option value="성인남">성인(남)</option><option value="성인여">성인(여)</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>성명</label><input type="text" id="f_name" placeholder="홍길동"></div>
@@ -495,6 +496,58 @@ function getProgressClass(p) {
   return 'mini-pink';
 }
 
+function renderCard(p) {
+  const isWait = !p.name || p.type === '대기' || p.type === '';
+  const bc = p.type === '성인남' ? 'badge-m' : p.type === '성인여' ? 'badge-f' : 'badge-wait';
+  const bt = p.type === '성인남' ? '남' : p.type === '성인여' ? '여' : '대기';
+  const disHtml = p.discharge ? `<span class="chip chip-green">${p.discharge}</span>` : '<span class="info-val muted">-</span>';
+  return `
+  <div class="patient-card${isWait?' is-waiting':''}" id="card-${p.id}" style="border-radius:0;border:none;border-bottom:0.5px solid var(--border);margin-bottom:0">
+    <div class="card-header" onclick="${editMode?`toggleSelectCard(event,${p.id})`:`toggleCard(${p.id})`}">
+      ${p.doctor==='김성민'?'<span class="badge-dr-kim">김</span>':p.doctor==='권기영'?'<span class="badge-dr-kwon">권</span>':''}
+      <span class="badge ${bc}">${bt}</span>
+      <span class="card-room">${p.room}</span>
+      <span class="card-name">${p.name||'<span style="color:var(--text3);font-size:13px">대기</span>'}</span>
+      ${!isWait?`
+        <span class="mini-tag ${p.discharge?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')">퇴원</span>
+        ${(p.ward==='85w'||p.ward==='퇴원환자')?`
+        <span class="mini-tag ${p.deathNote?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')">임종</span>
+        <span class="mini-tag ${p.readmit==='가정형/재입원'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')">돌봄</span>
+        <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')">경과</span>
+        `:''}
+        ${(p.admDate||p.days)?`<span class="card-days">${calcDays(p)}일</span>`:''}
+      `:''}
+      ${editMode ? `<span class="check-box" onclick="toggleSelectCard(event,${p.id})">${selectedIds.has(p.id)?'✓':''}</span>` : `<span class="chevron" id="chev-${p.id}">⌄</span>`}
+    </div>
+    ${p.note ? `<div style="padding:4px 14px 8px;font-size:12px;color:var(--text2);border-top:0.5px solid var(--border)">${p.note}</div>` : ''}
+    <div class="card-body" id="body-${p.id}">
+      <div class="info-grid">
+        <div class="info-item"><span class="info-lbl">퇴원기록</span>${disHtml}</div>
+        <div class="info-item"><span class="info-lbl">임종기록</span>
+          <select class="inline-edit" onchange="saveDeathNote(${p.id},this.value)" onclick="event.stopPropagation()" style="padding:4px 8px;font-size:13px">
+            <option value="" ${!p.deathNote?'selected':''}>-</option>
+            <option value="임종기록" ${p.deathNote==='임종기록'?'selected':''}>임종기록</option>
+            <option value="임종 이외" ${p.deathNote==='임종 이외'?'selected':''}>임종 이외</option>
+          </select>
+        </div>
+        <div class="info-item"><span class="info-lbl">돌봄상담</span><span class="info-val${!p.careConsult?' muted':''}">${p.careConsult||'-'}</span></div>
+        <div class="info-item"><span class="info-lbl">경과기록</span><span class="info-val">${getEffectiveProgress(p)}</span></div>
+        <div class="info-item"><span class="info-lbl">가정형/재입원</span><span class="info-val${!p.readmit?' muted':''}">${p.readmit||'-'}</span></div>
+        <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}">${fmtDate(p.admDate)||'-'}</span></div>
+        <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}">${p.doctor||'-'}</span></div>
+        <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}">${p.disease||'-'}</span></div>
+        <div class="info-item full"><span class="info-lbl">특이사항</span><input class="inline-edit" value="${p.note||''}" placeholder="특이사항 입력..." onblur="saveNote(${p.id},this.value)" onclick="event.stopPropagation()"></div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-del" onclick="askDel(${p.id})">대기로 변환</button>
+        <button class="btn-move" onclick="openMoveRoom(${p.id})">병실이동</button>
+        <button class="btn-discharge" onclick="moveToDischarged(${p.id})">퇴원환자로 이동</button>
+        <button class="btn-edit" onclick="openSheet(${p.id})">수정</button>
+      </div>
+    </div>
+  </div>`;
+}
+  
 function render() {
   const list = all.filter(p => p.ward === currentWard).sort((a,b) => a.room.localeCompare(b.room));
   document.getElementById('sectionLabel').textContent = currentWard + ' 병동';
@@ -532,57 +585,37 @@ function render() {
   document.getElementById('stat-death-lack').textContent = deathLack;
   const el = document.getElementById('patientList');
   if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>'; return; }
-  el.innerHTML = list.map(p => {
-    const isWait = !p.name || p.type === '대기';
-    const bc = p.type === '성인남' ? 'badge-m' : p.type === '성인여' ? 'badge-f' : 'badge-wait';
-    const bt = p.type === '성인남' ? '남' : p.type === '성인여' ? '여' : '대기';
-    const disHtml = p.discharge ? `<span class="chip chip-green">${p.discharge}</span>` : '<span class="info-val muted">-</span>';
+  // 병실 그룹 정의
+  const roomGroups = [
+    ['850101'],
+    ['850201','850202','850203','850204'],
+    ['850301','850302','850303','850304'],
+    ['850401','850402','850403','850404'],
+    ['850501','850502','850503','850504'],
+    ['850601'],
+    ['850701','850702','850703'],
+    ['850801','850802','850803','850804'],
+    ['850901','850902','850903','850904'],
+  ];
+
+  // 병동 prefix (85w → 85, 75w → 75, 65w → 65)
+  const prefix = currentWard.replace('w','');
+
+  // 그룹별로 렌더링
+  const grouped = roomGroups.map(group => {
+    const rooms = group.map(r => r.replace('85', prefix));
+    const patients = rooms.map(room => list.find(p => p.room === room)).filter(Boolean);
+    if (!patients.length) return '';
     return `
-    <div class="patient-card${isWait?' is-waiting':''}" id="card-${p.id}">
-      <div class="card-header" onclick="${editMode?`toggleSelectCard(event,${p.id})`:`toggleCard(${p.id})`}">
-        ${p.doctor==='김성민'?'<span class="badge-dr-kim">김</span>':p.doctor==='권기영'?'<span class="badge-dr-kwon">권</span>':''}
-        <span class="badge ${bc}">${bt}</span>
-        <span class="card-room">${p.room}</span>
-        <span class="card-name">${p.name||'<span style="color:var(--text3);font-size:13px">대기</span>'}</span>
-        ${!isWait?`
-          <span class="mini-tag ${p.discharge?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')">퇴원</span>
-          ${(p.ward==='85w'||p.ward==='퇴원환자')?`
-          <span class="mini-tag ${p.deathNote?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')">임종</span>
-          <span class="mini-tag ${p.readmit==='가정형/재입원'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')">돌봄</span>
-          <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')">경과</span>
-          `:''}
-          ${(p.admDate||p.days)?`<span class="card-days">${calcDays(p)}일</span>`:''}
-        `:''}
-        ${editMode ? `<span class="check-box" onclick="toggleSelectCard(event,${p.id})">${selectedIds.has(p.id)?'✓':''}</span>` : `<span class="chevron" id="chev-${p.id}">⌄</span>`}
-      </div>
-      ${p.note ? `<div style="padding:4px 14px 8px;font-size:12px;color:var(--text2);border-top:0.5px solid var(--border)">${p.note}</div>` : ''}
-      <div class="card-body" id="body-${p.id}">
-        <div class="info-grid">
-          <div class="info-item"><span class="info-lbl">퇴원기록</span>${disHtml}</div>
-          <div class="info-item"><span class="info-lbl">임종기록</span>
-            <select class="inline-edit" onchange="saveDeathNote(${p.id},this.value)" onclick="event.stopPropagation()" style="padding:4px 8px;font-size:13px">
-              <option value="" ${!p.deathNote?'selected':''}>-</option>
-              <option value="임종기록" ${p.deathNote==='임종기록'?'selected':''}>임종기록</option>
-              <option value="임종 이외" ${p.deathNote==='임종 이외'?'selected':''}>임종 이외</option>
-            </select>
-          </div>
-          <div class="info-item"><span class="info-lbl">돌봄상담</span><span class="info-val${!p.careConsult?' muted':''}">${p.careConsult||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">경과기록</span><span class="info-val">${getEffectiveProgress(p)}</span></div>
-          <div class="info-item"><span class="info-lbl">가정형/재입원</span><span class="info-val${!p.readmit?' muted':''}">${p.readmit||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">입원일</span><span class="info-val${!p.admDate?' muted':''}">${fmtDate(p.admDate)||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">담당의</span><span class="info-val${!p.doctor?' muted':''}">${p.doctor||'-'}</span></div>
-          <div class="info-item"><span class="info-lbl">병명</span><span class="info-val${!p.disease?' muted':''}">${p.disease||'-'}</span></div>
-          <div class="info-item full"><span class="info-lbl">특이사항</span><input class="inline-edit" value="${p.note||''}" placeholder="특이사항 입력..." onblur="saveNote(${p.id},this.value)" onclick="event.stopPropagation()"></div>
-        </div>
-        <div class="card-actions">
-          <button class="btn-del" onclick="askDel(${p.id})">대기로 변환</button>
-          <button class="btn-move" onclick="openMoveRoom(${p.id})">병실이동</button>
-          <button class="btn-discharge" onclick="moveToDischarged(${p.id})">퇴원환자로 이동</button>
-          <button class="btn-edit" onclick="openSheet(${p.id})">수정</button>
-        </div>
-      </div>
-    </div>`;
+      <div style="border:1.5px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">
+        ${patients.map(p => renderCard(p)).join('')}
+      </div>`;
   }).join('');
+
+  el.innerHTML = grouped || '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>';
+  return;
+
+  
 }
 
 window.toggleCard = function(id) {
