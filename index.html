@@ -191,7 +191,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.8)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.9)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -339,7 +339,28 @@ const db = getDatabase(app);
 const dbRef = ref(db, 'patients');
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-const ALLOWED_EMAILS = ['kimsungmin83@gmail.com', '새___이메일@gmail.com', '또___다른____이메일@gmail.com'];
+const ADMIN_EMAIL = 'kimsungmin83@gmail.com';
+const STAFF_EMAILS = [
+  'userA@gmail.com',  // ← A 사용자 이메일로 교체
+  'userB@gmail.com',  // ← B 사용자 이메일로 교체
+];
+const ALLOWED_EMAILS = [ADMIN_EMAIL, ...STAFF_EMAILS];
+
+function isAdmin(email) { return email === ADMIN_EMAIL; }
+function isStaff(email) { return STAFF_EMAILS.includes(email); }
+function canEditPatient(p) {
+  if (!currentUserEmail) return false;
+  if (isAdmin(currentUserEmail)) return true;
+  if (p.doctor === '권기영') return true;
+  return false;
+}
+function canToggleProgress(p) {
+  if (!currentUserEmail) return false;
+  if (isAdmin(currentUserEmail)) return true;
+  return true; // 모든 사용자 경과 토글 가능
+}
+
+let currentUserEmail = '';
 
 // 로그인 화면
 function showLoginScreen() {
@@ -372,6 +393,7 @@ window.googleLogout = async function() {
 onAuthStateChanged(auth, (user) => {
   document.getElementById('loadingOverlay').style.display = 'none';
   if (user && ALLOWED_EMAILS.includes(user.email)) {
+    currentUserEmail = user.email;
     showApp();
     // Firebase 데이터 연결
     onValue(dbRef, (snapshot) => {
@@ -513,10 +535,10 @@ function renderCard(p) {
       <span class="card-room">${p.room}</span>
       <span class="card-name">${p.name||'<span style="color:var(--text3);font-size:13px">대기</span>'}</span>
       ${!isWait?`
-        <span class="mini-tag ${p.discharge?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'discharge')">퇴원</span>
+        <span class="mini-tag ${p.discharge?'mini-green':'mini-red'}" ${canEditPatient(p)?`onclick="quickToggle(event,${p.id},'discharge')"`:''} style="${canEditPatient(p)?'':'cursor:default;opacity:.7'}">퇴원</span>
         ${(p.ward==='85w'||p.ward==='퇴원환자')?`
-        <span class="mini-tag ${p.deathNote?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'deathNote')">임종</span>
-        <span class="mini-tag ${p.readmit==='가정형/재입원'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" onclick="quickToggle(event,${p.id},'careConsult')">돌봄</span>
+        <span class="mini-tag ${p.deathNote?'mini-green':'mini-red'}" ${canEditPatient(p)?`onclick="quickToggle(event,${p.id},'deathNote')"`:''} style="${canEditPatient(p)?'':'cursor:default;opacity:.7'}">임종</span>
+        <span class="mini-tag ${p.readmit==='가정형/재입원'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" ${canEditPatient(p)?`onclick="quickToggle(event,${p.id},'careConsult')"`:''} style="${canEditPatient(p)?'':'cursor:default;opacity:.7'}">돌봄</span>
         <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')">경과</span>
         `:''}
         ${(p.admDate||p.days)?`<span class="card-days">${calcDays(p)}일</span>`:''}
@@ -543,10 +565,12 @@ function renderCard(p) {
         <div class="info-item full"><span class="info-lbl">특이사항</span><input class="inline-edit" value="${p.note||''}" placeholder="특이사항 입력..." onblur="saveNote(${p.id},this.value)" onclick="event.stopPropagation()"></div>
       </div>
       <div class="card-actions">
+        ${canEditPatient(p)?`
         <button class="btn-del" onclick="askDel(${p.id})">대기로 변환</button>
         <button class="btn-move" onclick="openMoveRoom(${p.id})">병실이동</button>
         <button class="btn-discharge" onclick="moveToDischarged(${p.id})">퇴원환자로 이동</button>
         <button class="btn-edit" onclick="openSheet(${p.id})">수정</button>
+        `:''}
       </div>
     </div>
   </div>`;
