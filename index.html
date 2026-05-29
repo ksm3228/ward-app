@@ -191,7 +191,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.6)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.7)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -606,6 +606,11 @@ function render() {
   const prefix = currentWard.replace('w','');
 
   // 그룹별로 렌더링
+  if (isDischargeWard) {
+    el.innerHTML = list.map(p => `<div style="border:1.5px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${renderCard(p)}</div>`).join('');
+    return;
+  }
+
   const grouped = roomGroups.map(group => {
     const rooms = group.map(r => r.replace('85', prefix));
     const patients = rooms.map(room => list.find(p => p.room === room)).filter(Boolean);
