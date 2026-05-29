@@ -191,7 +191,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.7)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v9.8)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -205,7 +205,7 @@
   <div class="ward-tabs">
     <button class="tab active" onclick="selectWard('85w',this)">85w</button>
     <button class="tab" onclick="selectWard('75w',this)">75w</button>
-    <button class="tab" onclick="selectWard('65w',this)">65w</button>
+    <button class="tab" onclick="selectWard('62w',this)">62w</button>
     <button class="tab" onclick="selectWard('퇴원환자',this)">퇴원환자</button>
   </div>
 </div>
@@ -290,7 +290,7 @@
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
         <button class="btn-edit" style="text-align:left;padding:10px 14px" onclick="selectMoveWard('same')">현재 병동 내 빈 병실</button>
         <button id="btn-move-75w" class="btn-edit" style="text-align:left;padding:10px 14px" onclick="selectMoveWard('75w')">75w 병동으로 이동</button>
-        <button id="btn-move-65w" class="btn-edit" style="text-align:left;padding:10px 14px" onclick="selectMoveWard('65w')">65w 병동으로 이동</button>
+        <button id="btn-move-62w" class="btn-edit" style="text-align:left;padding:10px 14px" onclick="selectMoveWard('62w')">62w 병동으로 이동</button>
         <button id="btn-move-85w" class="btn-edit" style="text-align:left;padding:10px 14px" onclick="selectMoveWard('85w')">85w 병동으로 이동</button>
       </div>
       <div class="confirm-btns">
@@ -602,8 +602,8 @@ function render() {
     ['850901','850902','850903','850904'],
   ];
 
-  // 병동 prefix (85w → 85, 75w → 75, 65w → 65)
-  const prefix = currentWard.replace('w','');
+  // 병동 prefix (85w → 85, 75w → 75, 62w → 62)
+  const prefix = currentWard === '62w' ? '62' : currentWard.replace('w','');
 
   // 그룹별로 렌더링
   if (isDischargeWard) {
@@ -611,18 +611,23 @@ function render() {
     return;
   }
 
-  const grouped = roomGroups.map(group => {
+  // 그룹에 없는 환자도 표시
+  const groupedRooms = new Set();
+  const groupedHtml = roomGroups.map(group => {
     const rooms = group.map(r => r.replace('85', prefix));
     const patients = rooms.map(room => list.find(p => p.room === room)).filter(Boolean);
+    patients.forEach(p => groupedRooms.add(p.id));
     if (!patients.length) return '';
-    return `
-      <div style="border:1.5px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">
-        ${patients.map(p => renderCard(p)).join('')}
-      </div>`;
+    return `<div style="border:1.5px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${patients.map(p => renderCard(p)).join('')}</div>`;
   }).join('');
 
-  el.innerHTML = grouped || '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>';
+  // 그룹에 포함되지 않은 환자 (병동 이동으로 추가된 환자 등)
+  const ungrouped = list.filter(p => !groupedRooms.has(p.id));
+  const ungroupedHtml = ungrouped.map(p => `<div style="border:1.5px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${renderCard(p)}</div>`).join('');
+
+  el.innerHTML = (groupedHtml + ungroupedHtml) || '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>';
   return;
+
 
   
 }
@@ -638,7 +643,7 @@ window.selectWard = function(ward, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   const editBtn = document.getElementById('btnWardEdit');
-  editBtn.style.display = (ward === '75w' || ward === '65w' || ward === '퇴원환자') ? 'block' : 'none';
+  editBtn.style.display = (ward === '75w' || ward === '62w' || ward === '퇴원환자') ? 'block' : 'none';
   editBtn.classList.remove('active');
   editBtn.textContent = '편집';
   editBtn.onclick = toggleEditMode;
@@ -705,7 +710,7 @@ window.openMoveRoom = function(id) {
   moveTargetWard = null;
   // 현재 병동에 따라 불필요한 버튼 숨기기
   document.getElementById('btn-move-75w').style.display = currentWard === '75w' ? 'none' : 'block';
-  document.getElementById('btn-move-65w').style.display = currentWard === '65w' ? 'none' : 'block';
+  document.getElementById('btn-move-62w').style.display = currentWard === '62w' ? 'none' : 'block';
   document.getElementById('btn-move-85w').style.display = currentWard === '85w' ? 'none' : 'block';
   document.getElementById('moveStep1').style.display = 'block';
   document.getElementById('moveStep2').style.display = 'none';
