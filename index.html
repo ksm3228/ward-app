@@ -193,7 +193,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v10.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v10.3)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -534,7 +534,7 @@ function renderCard(p) {
   const isToday = !isWait && calcDays(p) === 1;
   const hasDeath = !isWait && p.deathNote && p.deathNote !== '';
   return `
-  <div class="patient-card${isWait?' is-waiting':''}" id="card-${p.id}" style="border-radius:0;border:none;border-bottom:0.5px solid var(--border);margin-bottom:0${hasDeath?';background:#f0f0f5':isToday?';background:#fffde7':''}">
+  <div class="patient-card${isWait?' is-waiting':''}" id="card-${p.id}" style="border-radius:0;border:none;border-bottom:0.5px solid ${hasDeath?'#2e2e42':'var(--border)'};margin-bottom:0${hasDeath?';background:#1a1a2e;color:#e8e8f0':isToday?';background:#fffde7':''}">
     <div class="card-header" onclick="${editMode?`toggleSelectCard(event,${p.id})`:`toggleCard(${p.id})`}">
       ${p.doctor==='김성민'?'<span class="badge-dr-kim">김</span>':p.doctor==='권기영'?'<span class="badge-dr-kwon">권</span>':''}
       <span class="badge ${bc}">${bt}</span>
@@ -551,7 +551,7 @@ function renderCard(p) {
       `:''}
       ${editMode ? `<span class="check-box" onclick="toggleSelectCard(event,${p.id})">${selectedIds.has(p.id)?'✓':''}</span>` : `<span class="chevron" id="chev-${p.id}">⌄</span>`}
     </div>
-   ${(p.disease || p.note) ? `<div style="padding:4px 14px 8px;font-size:12px;color:var(--text2);border-top:0.5px solid var(--border)">${[p.disease, p.note].filter(Boolean).join(' | ')}</div>` : ''}
+   ${(p.disease || p.note) ? `<div style="padding:4px 14px 8px;font-size:12px;color:${hasDeath?'#9090b0':'var(--text2)'};border-top:0.5px solid ${hasDeath?'#2e2e42':'var(--border)'}">${[p.disease, p.note].filter(Boolean).join(' | ')}</div>` : ''}
     <div class="card-body" id="body-${p.id}">
       <div class="info-grid">
         <div class="info-item"><span class="info-lbl">퇴원기록</span>${disHtml}</div>
