@@ -168,6 +168,10 @@
   .patient-card.selected .check-box { background: var(--danger); border-color: var(--danger); color: #fff; }
 
 .tab.active #badge-discharge { background: #fff; color: #dc2626; }
+
+
+.tab.active span[id^="badge-"] { background: rgba(255,255,255,0.3) !important; color: #fff !important; }
+  .tab:not(.active) span[id^="badge-"] { background: #2563eb !important; color: #fff !important; }
   
 </style>
 </head>
@@ -193,7 +197,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v11.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v12.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -205,9 +209,9 @@
     </div>
   </div>
   <div class="ward-tabs">
-    <button class="tab active" onclick="selectWard('85w',this)">85w</button>
-    <button class="tab" onclick="selectWard('75w',this)">75w</button>
-    <button class="tab" onclick="selectWard('62w',this)">62w</button>
+    <button class="tab active" onclick="selectWard('85w',this)">85w <span id="badge-85w" style="display:none;background:rgba(255,255,255,0.3);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:2px">0</span></button>
+    <button class="tab" onclick="selectWard('75w',this)">75w <span id="badge-75w" style="display:none;background:#2563eb;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:2px">0</span></button>
+    <button class="tab" onclick="selectWard('62w',this)">62w <span id="badge-62w" style="display:none;background:#2563eb;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:2px">0</span></button>
     <button class="tab" onclick="selectWard('퇴원환자',this)">퇴원환자 <span id="badge-discharge" style="display:none;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:2px">0</span></button>
   </div>
 </div>
@@ -627,6 +631,17 @@ function render() {
   if (badge) {
     badge.textContent = tabLack;
     badge.style.display = tabLack > 0 ? 'inline' : 'none';
+  }
+
+  // 병동별 입원 중 배지 업데이트
+  ['85w','75w','62w'].forEach(ward => {
+    const count = all.filter(p => p.ward === ward && p.name && p.type !== '대기' && p.type !== '').length;
+    const b = document.getElementById('badge-'+ward);
+    if (b) {
+      b.textContent = count;
+      b.style.display = count > 0 ? 'inline' : 'none';
+    }
+  });
   }
   const el = document.getElementById('patientList');
   if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>'; return; }
