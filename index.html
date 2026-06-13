@@ -171,7 +171,10 @@
 
 
 .tab.active span[id^="badge-"] { background: rgba(255,255,255,0.3) !important; color: #fff !important; }
-  .tab:not(.active) span[id^="badge-"] { background: #2563eb !important; color: #fff !important; }
+.tab:not(.active) span[id^="badge-"]:not(#badge-discharge) { background: #2563eb !important; color: #fff !important; }
+
+.tab #badge-discharge { background: #dc2626 !important; color: #fff !important; }
+
   
 </style>
 </head>
@@ -197,7 +200,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v12.0)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v12.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
