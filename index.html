@@ -200,7 +200,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v12.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v12.3)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -553,12 +553,12 @@ function renderCard(p) {
         <span class="mini-tag ${p.deathNote?'mini-green':'mini-red'}" ${canEditPatient(p)?`onclick="quickToggle(event,${p.id},'deathNote')"`:''} style="${canEditPatient(p)?'':'cursor:default;opacity:.7'}">임종</span>
         <span class="mini-tag ${p.readmit==='가정형/재입원'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" ${canEditPatient(p)?`onclick="quickToggle(event,${p.id},'careConsult')"`:''} style="${canEditPatient(p)?'':'cursor:default;opacity:.7'}">돌봄</span>
         <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')">경과</span>
-        ${p.admDate&&!isWait?`<span style="font-size:9px;color:${hasDeath?'#9090b0':'var(--text3)'};flex-shrink:0">${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+3);return `${d.getMonth()+1}/${d.getDate()}`;})()}</span>`:''}
         `:''}
         ${(p.admDate||p.days)?`<span class="card-days">${calcDays(p)}일</span>`:''}
       `:''}
       ${editMode ? `<span class="check-box" onclick="toggleSelectCard(event,${p.id})">${selectedIds.has(p.id)?'✓':''}</span>` : `<span class="chevron" id="chev-${p.id}">⌄</span>`}
     </div>
+   ${p.admDate&&!isWait?`<div style="padding:2px 14px 0;font-size:10px;color:${hasDeath?'#9090b0':'var(--text3)'};text-align:right">경과기록 작성일: ${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+3);return `${d.getMonth()+1}/${d.getDate()}`;})()}</div>`:''}
    ${(p.disease || p.note) ? `<div style="padding:4px 14px 8px;font-size:12px;color:${hasDeath?'#9090b0':'var(--text2)'};border-top:0.5px solid ${hasDeath?'#2e2e42':'var(--border)'}">${[p.disease, p.note].filter(Boolean).join(' | ')}</div>` : ''}
    ${p.ward==='퇴원환자'&&(!p.discharge||!p.deathNote)?`<div style="padding:3px 14px 5px;font-size:11px;font-weight:600;color:#dc2626;border-top:0.5px solid #fca5a5;background:#fef2f2">${[!p.discharge?'퇴원기록 미비':'', !p.deathNote?'임종기록 미비':''].filter(Boolean).join(' · ')}</div>`:''}
     <div class="card-body" id="body-${p.id}">
