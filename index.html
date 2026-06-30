@@ -553,6 +553,7 @@ function renderCard(p) {
         <span class="mini-tag ${p.deathNote?'mini-green':'mini-red'}" ${canEditPatient(p)?`onclick="quickToggle(event,${p.id},'deathNote')"`:''} style="${canEditPatient(p)?'':'cursor:default;opacity:.7'}">임종</span>
         <span class="mini-tag ${p.readmit==='가정형/재입원'?'mini-gray':p.careConsult?'mini-green':'mini-red'}" ${canEditPatient(p)?`onclick="quickToggle(event,${p.id},'careConsult')"`:''} style="${canEditPatient(p)?'':'cursor:default;opacity:.7'}">돌봄</span>
         <span class="mini-tag ${getProgressClass(p)}" onclick="quickToggle(event,${p.id},'progressNote')">경과</span>
+        ${p.admDate&&!isWait?`<span style="font-size:9px;color:${hasDeath?'#9090b0':'var(--text3)'};flex-shrink:0">${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+3);return `${d.getMonth()+1}/${d.getDate()}`;})()}</span>`:''}
         `:''}
         ${(p.admDate||p.days)?`<span class="card-days">${calcDays(p)}일</span>`:''}
       `:''}
