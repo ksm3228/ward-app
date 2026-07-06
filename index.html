@@ -200,7 +200,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v13.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v13.2)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -688,13 +688,12 @@ function render() {
     const patients = rooms.map(room => list.find(p => p.room === room)).filter(Boolean);
     patients.forEach(p => groupedRooms.add(p.id));
     if (!patients.length) return '';
-    const hasProgRed = patients.some(p => !(!p.name||p.type==='대기'||p.type==='') && getEffectiveProgress(p)==='-');
-    return `<div style="border:1.5px solid ${hasProgRed?'#dc2626':'var(--border2)'};border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${patients.map(p => renderCard(p)).join('')}</div>`;
+    return `<div style="border:1.5px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${patients.map(p => { const isWaitP = !p.name||p.type==='대기'||p.type===''; const progRed = !isWaitP && getEffectiveProgress(p)==='-'; return progRed ? `<div style="outline:2px solid #dc2626;outline-offset:-2px;position:relative">${renderCard(p)}</div>` : renderCard(p); }).join('')}</div>`;
   }).join('');
 
   // 그룹에 포함되지 않은 환자 (병동 이동으로 추가된 환자 등)
   const ungrouped = list.filter(p => !groupedRooms.has(p.id));
-  const ungroupedHtml = ungrouped.map(p => { const progRed = !(!p.name||p.type==='대기'||p.type==='') && getEffectiveProgress(p)==='-'; return `<div style="border:1.5px solid ${progRed?'#dc2626':'var(--border2)'};border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${renderCard(p)}</div>`; }).join('');
+  const ungroupedHtml = ungrouped.map(p => { const isWaitP = !p.name||p.type==='대기'||p.type===''; const progRed = !isWaitP && getEffectiveProgress(p)==='-'; return `<div style="border:1.5px solid ${progRed?'#dc2626':'var(--border2)'};border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${renderCard(p)}</div>`; }).join('');
 
   el.innerHTML = (groupedHtml + ungroupedHtml) || '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>';
   return;
