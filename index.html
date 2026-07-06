@@ -200,7 +200,7 @@
 <div id="appContent" style="display:none">  
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v12.4)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v13.1)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -558,7 +558,7 @@ function renderCard(p) {
       `:''}
       ${editMode ? `<span class="check-box" onclick="toggleSelectCard(event,${p.id})">${selectedIds.has(p.id)?'✓':''}</span>` : `<span class="chevron" id="chev-${p.id}">⌄</span>`}
     </div>
-   ${p.admDate&&!isWait&&getEffectiveProgress(p)!=='o'?`<div style="padding:2px 14px 0;font-size:10px;color:${hasDeath?'#9090b0':'var(--text3)'};text-align:right">경과기록 작성일: ${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+3);return `${d.getMonth()+1}/${d.getDate()}`;})()}</div>`:''}
+   ${p.admDate&&!isWait&&getEffectiveProgress(p)==='-'?`<div style="padding:2px 14px 0;font-size:10px;color:#dc2626;font-weight:600;text-align:right">경과기록 작성일: ${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+3);return `${d.getMonth()+1}/${d.getDate()}`;})()}</div>`:p.admDate&&!isWait&&getEffectiveProgress(p)==='n'?`<div style="padding:2px 14px 0;font-size:10px;color:${hasDeath?'#9090b0':'var(--text3)'};text-align:right">경과기록 작성일: ${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+3);return `${d.getMonth()+1}/${d.getDate()}`;})()}</div>`:''}
    ${(p.disease || p.note) ? `<div style="padding:4px 14px 8px;font-size:12px;color:${hasDeath?'#9090b0':'var(--text2)'};border-top:0.5px solid ${hasDeath?'#2e2e42':'var(--border)'}">${[p.disease, p.note].filter(Boolean).join(' | ')}</div>` : ''}
    ${p.ward==='퇴원환자'&&(!p.discharge||!p.deathNote)?`<div style="padding:3px 14px 5px;font-size:11px;font-weight:600;color:#dc2626;border-top:0.5px solid #fca5a5;background:#fef2f2">${[!p.discharge?'퇴원기록 미비':'', !p.deathNote?'임종기록 미비':''].filter(Boolean).join(' · ')}</div>`:''}
     <div class="card-body" id="body-${p.id}">
@@ -688,12 +688,13 @@ function render() {
     const patients = rooms.map(room => list.find(p => p.room === room)).filter(Boolean);
     patients.forEach(p => groupedRooms.add(p.id));
     if (!patients.length) return '';
-    return `<div style="border:1.5px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${patients.map(p => renderCard(p)).join('')}</div>`;
+    const hasProgRed = patients.some(p => !(!p.name||p.type==='대기'||p.type==='') && getEffectiveProgress(p)==='-');
+    return `<div style="border:1.5px solid ${hasProgRed?'#dc2626':'var(--border2)'};border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${patients.map(p => renderCard(p)).join('')}</div>`;
   }).join('');
 
   // 그룹에 포함되지 않은 환자 (병동 이동으로 추가된 환자 등)
   const ungrouped = list.filter(p => !groupedRooms.has(p.id));
-  const ungroupedHtml = ungrouped.map(p => `<div style="border:1.5px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${renderCard(p)}</div>`).join('');
+  const ungroupedHtml = ungrouped.map(p => { const progRed = !(!p.name||p.type==='대기'||p.type==='') && getEffectiveProgress(p)==='-'; return `<div style="border:1.5px solid ${progRed?'#dc2626':'var(--border2)'};border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${renderCard(p)}</div>`; }).join('');
 
   el.innerHTML = (groupedHtml + ungroupedHtml) || '<div class="empty-state"><div class="empty-icon">🛏️</div><div class="empty-text">등록된 환자가 없습니다<br>아래 + 버튼으로 추가하세요</div></div>';
   return;
