@@ -768,7 +768,7 @@ window.closeDischarge = function() { document.getElementById('dischargeBackdrop'
 window.confirmDischarge = function() {
   pushHistory();
   const idx = all.findIndex(x=>x.id===dischargeTargetId);
-  if(idx>=0) { const p=all[idx]; all.push({...p,id:nid++,ward:'퇴원환자'}); all[idx]={...p,type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''}; }
+  if(idx>=0) { const p=all[idx]; all.push({...p,id:nid++,ward:'퇴원환자'}); all[idx]={...p,id:nid++,type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:''}; }
   persist(); window.closeDischarge(); render(); toast('퇴원환자로 이동되었습니다');
 };
 
