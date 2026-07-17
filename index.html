@@ -214,7 +214,7 @@
 <div id="appContent" style="display:none">
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v13.6)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v13.7)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -789,7 +789,7 @@ function render() {
     if (!patients.length) return '';
     return `<div style="border:1.5px solid var(--border2);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${patients.map(p=>{
       const isWaitP=!p.name||p.type==='대기'||p.type==='';
-      const progRed=!isWaitP&&getEffectiveProgress(p)==='-';
+      const progRed=!isWaitP&&p.ward==='85w'&&getEffectiveProgress(p)==='-';
       return progRed?`<div style="outline:2px solid #dc2626;outline-offset:-2px;position:relative">${renderCard(p)}</div>`:renderCard(p);
     }).join('')}</div>`;
   }).join('');
@@ -797,7 +797,7 @@ function render() {
   const ungrouped = list.filter(p=>!groupedRooms.has(p.id));
   const ungroupedHtml = ungrouped.map(p=>{
     const isWaitP=!p.name||p.type==='대기'||p.type==='';
-    const progRed=!isWaitP&&getEffectiveProgress(p)==='-';
+    const progRed=!isWaitP&&p.ward==='85w'&&getEffectiveProgress(p)==='-';
     return `<div style="border:1.5px solid ${progRed?'#dc2626':'var(--border2)'};border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden">${renderCard(p)}</div>`;
   }).join('');
 
