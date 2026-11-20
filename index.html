@@ -233,7 +233,7 @@
 <div id="appContent" style="display:none">
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.5)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.6)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -386,7 +386,7 @@ const referralRef = ref(db, 'referrals');
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const ADMIN_EMAIL = 'kimsungmin83@gmail.com';
-const STAFF_EMAILS = ['userA@gmail.com','userB@gmail.com'];
+const STAFF_EMAILS = [];
 const ALLOWED_EMAILS = [ADMIN_EMAIL, ...STAFF_EMAILS];
 
 function isAdmin(email) { return email === ADMIN_EMAIL; }
