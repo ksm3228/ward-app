@@ -225,6 +225,23 @@
   </button>
 </div>
 
+<div id="lockScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:201;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px">
+  <div style="font-size:40px">🔒</div>
+  <div id="lockTitle" style="font-size:18px;font-weight:600;color:var(--text)">암호 문구 입력</div>
+  <div id="lockDesc" style="font-size:13px;color:var(--text2);text-align:center;max-width:320px;line-height:1.5">환자 데이터는 암호화되어 저장됩니다.</div>
+  <input id="lockPw" type="password" placeholder="암호 문구" autocomplete="current-password" style="width:260px;padding:12px;border-radius:var(--radius-md);border:0.5px solid var(--border2);background:var(--surface);color:var(--text);font-size:15px">
+  <input id="lockPw2" type="password" placeholder="암호 문구 확인" autocomplete="new-password" style="display:none;width:260px;padding:12px;border-radius:var(--radius-md);border:0.5px solid var(--border2);background:var(--surface);color:var(--text);font-size:15px">
+  <label style="font-size:13px;color:var(--text2);display:flex;align-items:center;gap:6px"><input type="checkbox" id="lockRemember" checked> 이 기기에서 기억하기</label>
+  <button id="lockBtn" onclick="submitPassphrase()" style="padding:12px 28px;border-radius:var(--radius-md);border:none;background:#16a34a;color:#fff;font-size:15px;font-weight:600;cursor:pointer">확인</button>
+  <div id="lockMsg" style="font-size:13px;color:#dc2626;min-height:18px"></div>
+  <button onclick="googleLogout()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer">로그아웃</button>
+</div>
+
+<div id="plainBanner" style="display:none;position:fixed;left:8px;right:8px;bottom:8px;z-index:150;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5">
+  🔐 암호화 완료. 며칠 사용해 보고 이상이 없으면 서버에 남아 있는 <b>암호화 전 원본</b>을 삭제하세요.
+  <div style="margin-top:6px;display:flex;gap:8px"><button onclick="downloadBackup()" style="padding:5px 10px;border-radius:6px;border:1px solid #f59e0b;background:#fff;cursor:pointer">백업 다시 받기</button><button onclick="deletePlaintext()" style="padding:5px 10px;border-radius:6px;border:none;background:#dc2626;color:#fff;cursor:pointer">원본 삭제</button><button onclick="document.getElementById('plainBanner').style.display='none'" style="margin-left:auto;padding:5px 10px;border-radius:6px;border:none;background:none;cursor:pointer">닫기</button></div>
+</div>
+
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
   <div class="loading-text">데이터 불러오는 중...</div>
@@ -233,13 +250,14 @@
 <div id="appContent" style="display:none">
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.6)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.7)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
         <button class="btn-history" id="btn-redo" onclick="redo()" title="앞으로" disabled>↪</button>
       </div>
       <span id="dateDisplay" style="font-size:12px;color:var(--text2)"></span>
+      <button onclick="lockNow()" style="font-size:11px;color:var(--text3);background:none;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:3px 8px;cursor:pointer">🔒 잠금</button>
       <button onclick="googleLogout()" style="font-size:11px;color:var(--text3);background:none;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:3px 8px;cursor:pointer">로그아웃</button>
       <button class="btn-ward-edit" id="btnWardEdit" onclick="toggleEditMode()">편집</button>
     </div>
@@ -366,7 +384,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -381,8 +399,106 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const dbRef = ref(db, 'patients');
-const referralRef = ref(db, 'referrals');
+const plainPatientsRef = ref(db, 'patients');
+const plainReferralsRef = ref(db, 'referrals');
+const dbRef = ref(db, 'patients_enc');
+const referralRef = ref(db, 'referrals_enc');
+const metaRef = ref(db, 'crypto_meta');
+
+// ── 암호화 (AES-GCM 256, PBKDF2-SHA256) ──
+const KEY_STORE = 'wardKey_v1';
+const PBKDF2_ITER = 310000;
+let cryptoKey = null;
+const b64 = u8 => { let s=''; u8.forEach(c=>s+=String.fromCharCode(c)); return btoa(s); };
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function deriveKey(pass, saltB64) {
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name:'PBKDF2', salt: unb64(saltB64), iterations: PBKDF2_ITER, hash:'SHA-256' }, base, { name:'AES-GCM', length:256 }, true, ['encrypt','decrypt']);
+}
+async function encryptJSON(obj) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, cryptoKey, new TextEncoder().encode(JSON.stringify(obj)));
+  return { v:1, iv: b64(iv), ct: b64(new Uint8Array(ct)) };
+}
+async function decryptJSON(blob, key = cryptoKey) {
+  const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv: unb64(blob.iv) }, key, unb64(blob.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function saveKeyLocal(key) {
+  try { localStorage.setItem(KEY_STORE, b64(new Uint8Array(await crypto.subtle.exportKey('raw', key)))); } catch(e) {}
+}
+async function loadKeyLocal() {
+  try { const s = localStorage.getItem(KEY_STORE); if (!s) return null;
+    return await crypto.subtle.importKey('raw', unb64(s), { name:'AES-GCM' }, true, ['encrypt','decrypt']); } catch(e) { return null; }
+}
+let cryptoMeta = null, lockMode = 'unlock';
+function showLock(mode, msg = '') {
+  lockMode = mode;
+  document.getElementById('loadingOverlay').style.display = 'none';
+  document.getElementById('lockScreen').style.display = 'flex';
+  document.getElementById('appContent').style.display = 'none';
+  const setup = mode === 'setup';
+  document.getElementById('lockTitle').textContent = setup ? '암호 문구 만들기' : '암호 문구 입력';
+  document.getElementById('lockDesc').innerHTML = setup
+    ? '환자 데이터를 암호화할 문구를 정하세요.<br><b>잊으면 데이터를 복구할 수 없습니다.</b><br>설정하면 기존 데이터 백업 파일이 먼저 다운로드됩니다.'
+    : '환자 데이터는 암호화되어 저장됩니다.';
+  document.getElementById('lockPw2').style.display = setup ? 'block' : 'none';
+  document.getElementById('lockPw').value = ''; document.getElementById('lockPw2').value = '';
+  document.getElementById('lockMsg').textContent = msg;
+  setTimeout(() => document.getElementById('lockPw').focus(), 50);
+}
+function downloadJSON(obj, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type:'application/json' }));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+}
+const stamp = () => new Date().toISOString().slice(0,16).replace(/[-:T]/g,'');
+window.downloadBackup = async function() {
+  const [p, r] = await Promise.all([get(plainPatientsRef), get(plainReferralsRef)]);
+  if (p.exists() || r.exists()) downloadJSON({ patients: p.val(), referrals: r.val() }, `ward-backup-원본-${stamp()}.json`);
+  downloadJSON({ patients: all, referrals }, `ward-backup-현재-${stamp()}.json`);
+};
+window.deletePlaintext = async function() {
+  if (!confirm('서버에 남아 있는 암호화 전 원본(patients, referrals)을 삭제합니다.\n백업 파일을 받아 두셨나요?')) return;
+  if (prompt('삭제하려면 "삭제"라고 입력하세요') !== '삭제') return;
+  try { await remove(plainPatientsRef); await remove(plainReferralsRef); document.getElementById('plainBanner').style.display='none'; toast('원본 삭제 완료'); }
+  catch(e) { alert('삭제 실패: ' + e.message); }
+};
+window.submitPassphrase = async function() {
+  const pw = document.getElementById('lockPw').value, msg = document.getElementById('lockMsg');
+  const btn = document.getElementById('lockBtn');
+  if (pw.length < 8) { msg.textContent = '8자 이상 입력하세요'; return; }
+  btn.disabled = true; msg.textContent = '';
+  try {
+    if (lockMode === 'setup') {
+      if (pw !== document.getElementById('lockPw2').value) { msg.textContent = '두 문구가 다릅니다'; return; }
+      // 1) 기존 원본 백업 다운로드
+      const [p, r] = await Promise.all([get(plainPatientsRef), get(plainReferralsRef)]);
+      const oldPatients = p.val(), oldReferrals = r.val();
+      downloadJSON({ patients: oldPatients, referrals: oldReferrals }, `ward-backup-원본-${stamp()}.json`);
+      // 2) 키 생성 + 확인값 저장
+      const salt = b64(crypto.getRandomValues(new Uint8Array(16)));
+      cryptoKey = await deriveKey(pw, salt);
+      const check = await encryptJSON('ward-ok');
+      // 3) 암호화본 기록 (원본은 그대로 둠)
+      await set(dbRef, await encryptJSON(Array.isArray(oldPatients) ? oldPatients : []));
+      await set(referralRef, await encryptJSON(Array.isArray(oldReferrals) ? oldReferrals : []));
+      await set(metaRef, { salt, iter: PBKDF2_ITER, check, createdAt: Date.now() });
+      cryptoMeta = { salt, check };
+      toast('암호화 완료');
+    } else {
+      const key = await deriveKey(pw, cryptoMeta.salt);
+      try { if (await decryptJSON(cryptoMeta.check, key) !== 'ward-ok') throw 0; }
+      catch(e) { msg.textContent = '암호 문구가 틀렸습니다'; return; }
+      cryptoKey = key;
+    }
+    if (document.getElementById('lockRemember').checked) await saveKeyLocal(cryptoKey);
+    document.getElementById('lockScreen').style.display = 'none';
+    startSync();
+  } catch(e) { msg.textContent = '오류: ' + e.message; }
+  finally { btn.disabled = false; }
+};
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('lockScreen').style.display === 'flex') submitPassphrase(); });
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const ADMIN_EMAIL = 'kimsungmin83@gmail.com';
@@ -415,34 +531,61 @@ window.googleLogin = async function() {
     if (!ALLOWED_EMAILS.includes(result.user.email)) { await signOut(auth); alert('접근 권한이 없습니다.'); }
   } catch(e) { alert('로그인 실패: ' + e.message); }
 };
-window.googleLogout = async function() { await signOut(auth); };
+window.googleLogout = async function() { try { localStorage.removeItem(KEY_STORE); } catch(e) {} await signOut(auth); location.reload(); };
 
 onAuthStateChanged(auth, (user) => {
   document.getElementById('loadingOverlay').style.display = 'none';
   if (user && ALLOWED_EMAILS.includes(user.email)) {
     currentUserEmail = user.email;
-    showApp();
-    onValue(dbRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data && Array.isArray(data) && data.length > 0) {
-        all = data.map(p => ({ careConsult:'', progressNote:'n', deathNote:'', readmit:'', ...p }));
-        setSyncDot('connected'); render();
-      } else if (!data && all.length === 0) {
-        all = JSON.parse(JSON.stringify(SAMPLE));
-        set(dbRef, all); setSyncDot('connected'); render();
-      }
-      processAdmitSms();
-    }, () => { setSyncDot(''); toast('Firebase 연결 실패'); });
-
-    onValue(referralRef, (snapshot) => {
-      const data = snapshot.val();
-      referrals = data && Array.isArray(data) ? data : [];
-      if (currentWard === '타과의뢰') renderReferrals();
-      updateReferralBadge();
-      processSmsReferral();
-    });
-  } else { showLoginScreen(); }
+    initCrypto();
+  } else { cryptoKey = null; document.getElementById('lockScreen').style.display = 'none'; showLoginScreen(); }
 });
+
+async function initCrypto() {
+  try {
+    const m = await get(metaRef);
+    if (!m.exists()) { showLock('setup'); return; }
+    cryptoMeta = m.val();
+    const saved = await loadKeyLocal();
+    if (saved) {
+      try { if (await decryptJSON(cryptoMeta.check, saved) === 'ward-ok') { cryptoKey = saved; startSync(); return; } } catch(e) {}
+      try { localStorage.removeItem(KEY_STORE); } catch(e) {}
+    }
+    showLock('unlock');
+  } catch(e) { showLoginScreen(); toast('Firebase 연결 실패'); }
+}
+
+let syncStarted = false;
+function startSync() {
+  if (syncStarted) return; syncStarted = true;
+  showApp();
+  onValue(dbRef, async (snapshot) => {
+    const blob = snapshot.val();
+    let data = null;
+    if (blob) { try { data = await decryptJSON(blob); } catch(e) { setSyncDot(''); toast('복호화 실패 — 암호 문구를 확인하세요'); return; } }
+    if (data && Array.isArray(data) && data.length > 0) {
+      all = data.map(p => ({ careConsult:'', progressNote:'n', deathNote:'', readmit:'', ...p }));
+      setSyncDot('connected'); render();
+    } else if (!data && all.length === 0) {
+      all = JSON.parse(JSON.stringify(SAMPLE));
+      persist(); render();
+    } else { setSyncDot('connected'); render(); }
+    processAdmitSms();
+  }, () => { setSyncDot(''); toast('Firebase 연결 실패'); });
+
+  onValue(referralRef, async (snapshot) => {
+    const blob = snapshot.val();
+    let data = null;
+    if (blob) { try { data = await decryptJSON(blob); } catch(e) { toast('복호화 실패'); return; } }
+    referrals = data && Array.isArray(data) ? data : [];
+    if (currentWard === '타과의뢰') renderReferrals();
+    updateReferralBadge();
+    processSmsReferral();
+  });
+
+  get(plainPatientsRef).then(s => { if (s.exists()) document.getElementById('plainBanner').style.display = 'block'; }).catch(()=>{});
+}
+window.lockNow = function() { try { localStorage.removeItem(KEY_STORE); } catch(e) {} location.reload(); };
 
 function setSyncDot(state) {
   const dot = document.getElementById('syncDot');
@@ -457,11 +600,13 @@ let dischargeOrder = null;
 
 async function persist() {
   setSyncDot('syncing');
-  try { await set(dbRef, all); setSyncDot('connected'); }
+  if (!cryptoKey) { setSyncDot(''); toast('잠금 상태 — 저장되지 않음'); return; }
+  try { await set(dbRef, await encryptJSON(all)); setSyncDot('connected'); }
   catch(e) { setSyncDot(''); toast('저장 실패'); }
 }
 async function persistReferrals() {
-  try { await set(referralRef, referrals); }
+  if (!cryptoKey) { toast('잠금 상태 — 저장되지 않음'); return; }
+  try { await set(referralRef, await encryptJSON(referrals)); }
   catch(e) { toast('저장 실패'); }
 }
 
