@@ -250,7 +250,7 @@
 <div id="appContent" style="display:none">
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.9)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.10)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -555,14 +555,14 @@ async function initCrypto() {
   } catch(e) { showLoginScreen(); toast('Firebase 연결 실패'); }
 }
 
-let syncStarted = false;
+let syncStarted = false, patientsLocked = false, referralsLocked = false;
 function startSync() {
   if (syncStarted) return; syncStarted = true;
   showApp();
   onValue(dbRef, async (snapshot) => {
     const blob = snapshot.val();
     let data = null;
-    if (blob) { try { data = await decryptJSON(blob); } catch(e) { setSyncDot(''); toast('복호화 실패 — 암호 문구를 확인하세요'); return; } }
+    if (blob) { try { data = await decryptJSON(blob); patientsLocked = false; } catch(e) { patientsLocked = true; setSyncDot(''); alert('환자 데이터 복호화 실패 — 데이터 보호를 위해 저장을 막았습니다. 새로고침 후 다시 시도하세요.'); return; } }
     if (data && Array.isArray(data) && data.length > 0) {
       all = data.map(p => ({ careConsult:'', progressNote:'n', deathNote:'', readmit:'', ...p }));
       setSyncDot('connected'); render();
@@ -576,7 +576,7 @@ function startSync() {
   onValue(referralRef, async (snapshot) => {
     const blob = snapshot.val();
     let data = null;
-    if (blob) { try { data = await decryptJSON(blob); } catch(e) { toast('복호화 실패'); return; } }
+    if (blob) { try { data = await decryptJSON(blob); referralsLocked = false; } catch(e) { referralsLocked = true; alert('의뢰 데이터 복호화 실패 — 데이터 보호를 위해 저장을 막았습니다. 새로고침 후 다시 시도하세요.'); return; } }
     referrals = data && Array.isArray(data) ? data : [];
     if (currentWard === '타과의뢰') renderReferrals();
     updateReferralBadge();
@@ -600,12 +600,12 @@ let dischargeOrder = null;
 
 async function persist() {
   setSyncDot('syncing');
-  if (!cryptoKey) { setSyncDot(''); toast('잠금 상태 — 저장되지 않음'); return; }
+  if (!cryptoKey || patientsLocked) { setSyncDot(''); toast('잠금·복호화 실패 상태 — 저장되지 않음'); return; }
   try { await set(dbRef, await encryptJSON(all)); setSyncDot('connected'); }
   catch(e) { setSyncDot(''); toast('저장 실패'); }
 }
 async function persistReferrals() {
-  if (!cryptoKey) { toast('잠금 상태 — 저장되지 않음'); return; }
+  if (!cryptoKey || referralsLocked) { toast('잠금·복호화 실패 상태 — 저장되지 않음'); return; }
   try { await set(referralRef, await encryptJSON(referrals)); }
   catch(e) { toast('저장 실패'); }
 }
