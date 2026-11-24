@@ -63,7 +63,8 @@
   .ward-tabs::-webkit-scrollbar { display: none; }
   .tab { padding: 6px 8px; border-radius: 20px; border: 0.5px solid var(--border2); font-size: 12px; font-weight: 500; cursor: pointer; background: var(--surface); color: var(--text2); white-space: nowrap; transition: all .15s; }
   .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px; position: sticky; top: var(--app-bar-height, 88px); z-index: 29; background: var(--bg); }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px; background: var(--bg); }
+  .sticky-top { position: sticky; top: var(--app-bar-height, 88px); z-index: 29; background: var(--bg); }
   .stat-card { background: var(--surface); border-radius: var(--radius-md); padding: 12px 10px; text-align: center; border: 0.5px solid var(--border); }
   .stat-num { font-size: 24px; font-weight: 600; line-height: 1; }
   .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 4px; }
@@ -72,7 +73,7 @@
   .patient-list { padding: 0 16px 100px; }
   .patient-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 10px; overflow: hidden; }
   .patient-card.is-waiting .card-header { opacity: .5; }
-  .chk-sum { margin:0 16px 10px; background:var(--surface); border:0.5px solid var(--border2); border-radius:var(--radius-lg); padding:8px 12px; }
+  .chk-sum { max-height:28vh; overflow-y:auto; margin:0 16px 10px; background:var(--surface); border:0.5px solid var(--border2); border-radius:var(--radius-lg); padding:8px 12px; }
   .chk-sum-ward { display:flex; gap:8px; align-items:flex-start; padding:4px 0; border-top:0.5px solid var(--border); }
   .chk-sum-ward:first-child { border-top:none; }
   .chk-sum-wname { font-size:12px; font-weight:700; color:var(--accent); min-width:30px; padding-top:3px; }
@@ -250,7 +251,7 @@
 <div id="appContent" style="display:none">
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.10)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.11)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -272,6 +273,7 @@
   </div>
 </div>
 
+<div id="stickyTop" class="sticky-top">
 <div class="stats-row" id="statsRow" style="grid-template-columns:repeat(4,1fr)">
   <div class="stat-card" id="stat-card-total" style="background:var(--accent);border-color:var(--accent)"><div class="stat-num" style="color:#fff" id="stat-total">0</div><div class="stat-lbl" style="color:rgba(255,255,255,0.8)">총 재원환자</div></div>
   <div class="stat-card" id="stat-card-active"><div class="stat-num stat-active" id="stat-active">0</div><div class="stat-lbl">입원 중</div></div>
@@ -282,6 +284,7 @@
 </div>
 
 <div id="chkSummary" class="chk-sum" style="display:none"></div>
+</div>
 <div class="section-label" id="sectionLabel">85w 병동</div>
 <div class="patient-list" id="patientList"></div>
 <button class="fab" id="mainFab" onclick="openSheet(null)" aria-label="환자 추가">+</button>
