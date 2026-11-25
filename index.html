@@ -261,7 +261,7 @@
 <div id="appContent" style="display:none">
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.16)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.17)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -1286,10 +1286,7 @@ function renderChkSummary() {
     if(!act.length) return;
     const pats=rows.filter(p=>act.some(([k])=>p[k]==='y')).map(p=>({p,ks:new Set(act.filter(([k])=>p[k]==='y').map(([k])=>k)),col:-1}));
     pats.sort((x,y)=>y.ks.size-x.ks.size||x.p.room.localeCompare(y.p.room));
-    pats.forEach((x,i)=>{
-      const used=new Set(pats.slice(0,i).filter(o=>[...o.ks].some(k=>x.ks.has(k))).map(o=>o.col));
-      let c=0; while(used.has(c)) c++; x.col=c;
-    });
+    pats.forEach((x,i)=>{ x.col=i; });
     const N=Math.max(...pats.map(x=>x.col))+1;
     const lines=act.map(([k,l],ri)=>{
       const cls='chk-sum-cell'+(ri===0?' first':'');
