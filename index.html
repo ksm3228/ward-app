@@ -78,7 +78,11 @@
   .chk-sum-ward:first-child { border-top:none; }
   .chk-sum-wname { font-size:12px; font-weight:700; color:var(--accent); min-width:30px; padding-top:3px; }
   .chk-sum-items { flex:1; min-width:0; }
-  .chk-sum-line { display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin:2px 0; }
+  .chk-sum-line { display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin:0; padding:5px 0; border-top:1px solid var(--border2); }
+  .chk-sum-line:first-child { border-top:none; }
+  .chk-sum-line.k-lab .chk-sum-k { background:#2563eb; } .chk-sum-line.k-lab .chk-sum-chip { background:#dbeafe; color:#1e40af; border-color:#2563eb; }
+  .chk-sum-line.k-cxr .chk-sum-k { background:#d97706; } .chk-sum-line.k-cxr .chk-sum-chip { background:#fef3c7; color:#92400e; border-color:#d97706; }
+  .chk-sum-line.k-axr .chk-sum-k { background:#7c3aed; } .chk-sum-line.k-axr .chk-sum-chip { background:#ede9fe; color:#5b21b6; border-color:#7c3aed; }
   .chk-sum-k { font-size:10px; font-weight:700; color:#fff; background:#6b7280; border-radius:4px; padding:2px 5px; min-width:30px; text-align:center; }
   .chk-sum-chip { font-size:11px; padding:2px 7px; border-radius:10px; background:#dcfce7; color:#166534; border:0.5px solid #16a34a; cursor:pointer; }
   .tab-arrow { display:none; margin-left:4px; font-size:11px; padding:0 3px; color:inherit; opacity:.85; }
@@ -251,7 +255,7 @@
 <div id="appContent" style="display:none">
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.11)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.12)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -1275,7 +1279,7 @@ function renderChkSummary() {
     const lines=keys.map(([k,l])=>{
       const items=rows.filter(p=>p[k]==='y');
       if(!items.length) return '';
-      return `<div class="chk-sum-line"><span class="chk-sum-k">${l}</span>${items.map(p=>`<span class="chk-sum-chip" onclick="uncheckChk(${p.id},'${k}')">${p.room}${p.name&&p.type!=='대기'?' '+p.name:''} ✕</span>`).join('')}</div>`;
+      return `<div class="chk-sum-line k-${k}"><span class="chk-sum-k">${l}</span>${items.map(p=>`<span class="chk-sum-chip" onclick="uncheckChk(${p.id},'${k}')">${p.room}${p.name&&p.type!=='대기'?' '+p.name:''} ✕</span>`).join('')}</div>`;
     }).join('');
     if(lines) html+=`<div class="chk-sum-ward"><span class="chk-sum-wname">${w}</span><div class="chk-sum-items">${lines}</div></div>`;
   });
