@@ -83,6 +83,7 @@
   .chk-sum-line.k-lab .chk-sum-k { background:#2563eb; } .chk-sum-line.k-lab .chk-sum-chip { background:#dbeafe; color:#1e40af; border-color:#2563eb; }
   .chk-sum-line.k-cxr .chk-sum-k { background:#d97706; } .chk-sum-line.k-cxr .chk-sum-chip { background:#fef3c7; color:#92400e; border-color:#d97706; }
   .chk-sum-line.k-ekg .chk-sum-k { background:#0d9488; } .chk-sum-line.k-ekg .chk-sum-chip { background:#ccfbf1; color:#115e59; border-color:#0d9488; }
+  .chk-sum-line.k-cdiff .chk-sum-k { background:#db2777; } .chk-sum-line.k-cdiff .chk-sum-chip { background:#fce7f3; color:#9d174d; border-color:#db2777; }
   .chk-sum-line.k-axr .chk-sum-k { background:#7c3aed; } .chk-sum-line.k-axr .chk-sum-chip { background:#ede9fe; color:#5b21b6; border-color:#7c3aed; }
   .chk-sum-k { font-size:10px; font-weight:700; color:#fff; background:#6b7280; border-radius:4px; padding:2px 5px; min-width:30px; text-align:center; }
   .chk-sum-chip { font-size:11px; padding:2px 7px; border-radius:10px; background:#dcfce7; color:#166534; border:0.5px solid #16a34a; cursor:pointer; }
@@ -257,7 +258,7 @@
 <div id="appContent" style="display:none">
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.14)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.15)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -700,7 +701,7 @@ function renderCard(p) {
       ${editMode?`<span class="check-box" onclick="toggleSelectCard(event,${p.id})">${selectedIds.has(p.id)?'✓':''}</span>`:`<span class="chevron" id="chev-${p.id}">⌄</span>`}
     </div>
    ${(p.ward==='퇴원환자'&&!isWait&&(p.prevPlace||p.diet))?`<div style="padding:0 14px 6px;font-size:12px;color:${hasDeath?'#9090b0':'var(--text2)'}">${[p.prevPlace?`이전: ${p.prevPlace}`:'',p.diet?`식이: ${p.diet}`:''].filter(Boolean).join(' · ')}</div>`:''}
-   ${p.ward!=='퇴원환자'?`<div class="chk-row" style="${hasDeath?'background:#1a1a2e':''}"><span class="chk-info" style="color:${hasDeath?'#9090b0':'var(--text2)'}">${(!isWait&&(p.prevPlace||p.diet))?[p.prevPlace?`이전: ${p.prevPlace}`:'',p.diet?`식이: ${p.diet}`:''].filter(Boolean).join(' · '):''}</span>${[['lab','Lab'],['cxr','CXR'],['axr','AXR'],['ekg','EKG']].map(([k,l])=>`<span class="chk-tag${p[k]==='y'?' on':''}" id="chk-${p.id}-${k}" onclick="toggleChk(event,${p.id},'${k}')">${p[k]==='y'?'✓':'☐'} ${l}</span>`).join('')}</div>`:''}
+   ${p.ward!=='퇴원환자'?`<div class="chk-row" style="${hasDeath?'background:#1a1a2e':''}"><span class="chk-info" style="color:${hasDeath?'#9090b0':'var(--text2)'}">${(!isWait&&(p.prevPlace||p.diet))?[p.prevPlace?`이전: ${p.prevPlace}`:'',p.diet?`식이: ${p.diet}`:''].filter(Boolean).join(' · '):''}</span>${[['lab','Lab'],['cxr','CXR'],['axr','AXR'],['ekg','EKG'],['cdiff','C.diff']].map(([k,l])=>`<span class="chk-tag${p[k]==='y'?' on':''}" id="chk-${p.id}-${k}" onclick="toggleChk(event,${p.id},'${k}')">${p[k]==='y'?'✓':'☐'} ${l}</span>`).join('')}</div>`:''}
    ${p.admDate&&!isWait&&getEffectiveProgress(p)==='-'?`<div style="padding:2px 14px 0;font-size:10px;color:#dc2626;font-weight:600;text-align:right">경과기록 작성일: ${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+progOffset(p));return `${d.getMonth()+1}/${d.getDate()}`;})()}</div>`:p.admDate&&!isWait&&getEffectiveProgress(p)==='n'?`<div style="padding:2px 14px 0;font-size:10px;color:${hasDeath?'#9090b0':'var(--text3)'};text-align:right">경과기록 작성일: ${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+progOffset(p));return `${d.getMonth()+1}/${d.getDate()}`;})()}</div>`:''}
    ${(p.disease||p.note)?`<div style="padding:4px 14px 8px;font-size:12px;color:${hasDeath?'#9090b0':'var(--text2)'};border-top:0.5px solid ${hasDeath?'#2e2e42':'var(--border)'}">${[p.disease,p.note].filter(Boolean).join(' | ')}</div>`:''}
    ${p.ward==='퇴원환자'&&(!p.discharge||!p.deathNote)?`<div style="padding:3px 14px 5px;font-size:11px;font-weight:600;color:#dc2626;border-top:0.5px solid #fca5a5;background:#fef2f2">${[!p.discharge?'퇴원기록 미비':'',!p.deathNote?'임종기록 미비':''].filter(Boolean).join(' · ')}</div>`:''}
@@ -871,7 +872,7 @@ function processAdmitSms() {
   const idx = all.findIndex(p => p.ward === a.ward && p.room === a.room);
   if (idx >= 0 && occupied(all[idx])) { toast(`${a.room}에 ${all[idx].name} 환자가 있어 등록하지 않았습니다`); return; }
   const type = '성인남';
-  const blank = {type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',prevPlace:'',diet:''};
+  const blank = {type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',cdiff:'',prevPlace:'',diet:''};
   const data = {...blank, type, name: a.name, admDate: ymd(new Date()), doctor: '김성민'};
   pushHistory();
   let id;
@@ -1120,7 +1121,7 @@ window.toggleChk = function(e, id, k) {
   all[idx][k] = all[idx][k]==='y' ? '' : 'y';
   const on = all[idx][k]==='y';
   const el=document.getElementById('chk-'+id+'-'+k);
-  if (el) { el.classList.toggle('on', on); el.textContent=(on?'✓ ':'☐ ')+({lab:'Lab',cxr:'CXR',axr:'AXR',ekg:'EKG'})[k]; }
+  if (el) { el.classList.toggle('on', on); el.textContent=(on?'✓ ':'☐ ')+({lab:'Lab',cxr:'CXR',axr:'AXR',ekg:'EKG',cdiff:'C.diff'})[k]; }
   persist();
 };
 window.quickToggle = function(e, id, field) {
@@ -1161,7 +1162,7 @@ window.closeConfirm=function(){document.getElementById('confirmBackdrop').classL
 window.confirmDelete=function(){
   pushHistory();
   const idx=all.findIndex(x=>x.id===delId);
-  if(idx>=0)all[idx]={...all[idx],type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',prevPlace:'',diet:''};
+  if(idx>=0)all[idx]={...all[idx],type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',cdiff:'',prevPlace:'',diet:''};
   persist();window.closeConfirm();render();toast('대기 병실로 변경되었습니다');
 };
 
@@ -1171,7 +1172,7 @@ window.closeDischarge=function(){document.getElementById('dischargeBackdrop').cl
 window.confirmDischarge=function(){
   pushHistory();
   const idx=all.findIndex(x=>x.id===dischargeTargetId);
-  if(idx>=0){const p=all[idx];all.push({...p,id:nid++,ward:'퇴원환자',dischargedAt:Date.now()});all[idx]={...p,id:nid++,type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',prevPlace:'',diet:''};}
+  if(idx>=0){const p=all[idx];all.push({...p,id:nid++,ward:'퇴원환자',dischargedAt:Date.now()});all[idx]={...p,id:nid++,type:'대기',name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',cdiff:'',prevPlace:'',diet:''};}
   persist();window.closeDischarge();render();toast('퇴원환자로 이동되었습니다');
 };
 
@@ -1217,7 +1218,7 @@ window.confirmMoveRoom=function(){
     const targetIdx=all.findIndex(p=>p.ward===moveTargetWard&&p.room===inputRoom);
     if(targetIdx>=0&&all[targetIdx].name&&all[targetIdx].type!=='대기'){alert('환자가 있는 병실입니다.');return;}
     pushHistory();
-    if(targetIdx>=0){const targetId=all[targetIdx].id;all[targetIdx]={...sp,id:targetId,room:inputRoom,ward:moveTargetWard};all[sourceIdx]={...sp,id:nid++,type:'대기',room:sRoom,ward:sWard,name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',prevPlace:'',diet:''};}
+    if(targetIdx>=0){const targetId=all[targetIdx].id;all[targetIdx]={...sp,id:targetId,room:inputRoom,ward:moveTargetWard};all[sourceIdx]={...sp,id:nid++,type:'대기',room:sRoom,ward:sWard,name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',cdiff:'',prevPlace:'',diet:''};}
     else{all[sourceIdx]={...sp,room:inputRoom,ward:moveTargetWard};all=all.filter((p,i)=>i===sourceIdx||!(p.room===inputRoom&&p.ward===moveTargetWard&&p.id!==sp.id));all.sort((a,b)=>a.ward.localeCompare(b.ward)||a.room.localeCompare(b.room));}
     persist();window.closeMoveRoom();render();toast(`[${moveTargetWard}] ${inputRoom} 병실로 이동되었습니다`);
   }else{
@@ -1227,7 +1228,7 @@ window.confirmMoveRoom=function(){
     pushHistory();
     const tRoom=all[targetIdx].room,tWard=all[targetIdx].ward;
     all[targetIdx]={...sp,room:tRoom,ward:tWard};
-    all[sourceIdx]={...sp,id:nid++,type:'대기',room:sRoom,ward:sWard,name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',prevPlace:'',diet:''};
+    all[sourceIdx]={...sp,id:nid++,type:'대기',room:sRoom,ward:sWard,name:'',days:'',disease:'',note:'',admDate:'',doctor:'',discharge:'',deathNote:'',careConsult:'',progressNote:'n',readmit:'',hospice:'',lab:'',cxr:'',axr:'',ekg:'',cdiff:'',prevPlace:'',diet:''};
     persist();window.closeMoveRoom();render();toast(`[${tWard}] ${tRoom} 병실로 이동되었습니다`);
   }
 };
@@ -1274,7 +1275,7 @@ function updateEmptySelects(){
 function renderChkSummary() {
   const box = document.getElementById('chkSummary'); if (!box) return;
   if (currentWard === '타과의뢰' || currentWard === '퇴원환자') { box.style.display='none'; return; }
-  const keys=[['lab','Lab'],['cxr','CXR'],['axr','AXR'],['ekg','EKG']];
+  const keys=[['lab','Lab'],['cxr','CXR'],['axr','AXR'],['ekg','EKG'],['cdiff','C.diff']];
   let html='';
   ['85w','75w','62w','52w'].forEach(w=>{
     const rows=all.filter(p=>p.ward===w).sort((a,b)=>a.room.localeCompare(b.room));
