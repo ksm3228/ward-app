@@ -94,8 +94,10 @@
   .ward-tabs.editing .tab-arrow { display:inline; }
   .ward-tabs.editing .tab { outline:1.5px dashed var(--accent); outline-offset:-2px; }
   .chk-row { display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:6px; padding:0 14px 8px; }
-  .chk-info { margin-right:auto; font-size:12px; min-width:0; }
-  .chk-tag { display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; border:1px solid #9ca3af; background:#fff; color:#6b7280; cursor:pointer; user-select:none; -webkit-user-select:none; }
+  .chk-info { flex:0 0 100%; font-size:12px; min-width:0; }
+  .chk-info:empty { display:none; }
+  .chk-tags { display:flex; flex-wrap:nowrap; gap:4px; margin-left:auto; }
+  .chk-tag { display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:700; padding:3px 6px; border-radius:6px; border:1px solid #9ca3af; background:#fff; white-space:nowrap; color:#6b7280; cursor:pointer; user-select:none; -webkit-user-select:none; }
   .chk-tag.on { background:#16a34a; border-color:#16a34a; color:#fff; }
   .card-header { display: flex; align-items: center; gap: 8px; padding: 13px 14px; cursor: pointer; user-select: none; -webkit-user-select: none; }
   .card-header:active { background: var(--surface2); }
@@ -261,7 +263,7 @@
 <div id="appContent" style="display:none">
 <div class="app-bar">
   <div class="app-bar-inner">
-    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.18)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
+    <span class="app-title">🏥 병동 환자 관리 <span style="font-size:11px;font-weight:400;color:var(--text3)">(v16.19)</span><span class="sync-dot" id="syncDot" title="동기화 상태"></span></span>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="history-btns">
         <button class="btn-history" id="btn-undo" onclick="undo()" title="되돌리기" disabled>↩</button>
@@ -703,7 +705,7 @@ function renderCard(p) {
       ${editMode?`<span class="check-box" onclick="toggleSelectCard(event,${p.id})">${selectedIds.has(p.id)?'✓':''}</span>`:`<span class="chevron" id="chev-${p.id}">⌄</span>`}
     </div>
    ${(p.ward==='퇴원환자'&&!isWait&&(p.prevPlace||p.diet))?`<div style="padding:0 14px 6px;font-size:12px;color:${hasDeath?'#9090b0':'var(--text2)'}">${[p.prevPlace?`이전: ${p.prevPlace}`:'',p.diet?`식이: ${p.diet}`:''].filter(Boolean).join(' · ')}</div>`:''}
-   ${p.ward!=='퇴원환자'?`<div class="chk-row" style="${hasDeath?'background:#1a1a2e':''}"><span class="chk-info" style="color:${hasDeath?'#9090b0':'var(--text2)'}">${(!isWait&&(p.prevPlace||p.diet))?[p.prevPlace?`이전: ${p.prevPlace}`:'',p.diet?`식이: ${p.diet}`:''].filter(Boolean).join(' · '):''}</span>${[['lab','Lab'],['cxr','CXR'],['axr','AXR'],['ekg','EKG'],['cdiff','C.diff']].map(([k,l])=>`<span class="chk-tag${p[k]==='y'?' on':''}" id="chk-${p.id}-${k}" onclick="toggleChk(event,${p.id},'${k}')">${p[k]==='y'?'✓':'☐'} ${l}</span>`).join('')}</div>`:''}
+   ${p.ward!=='퇴원환자'?`<div class="chk-row" style="${hasDeath?'background:#1a1a2e':''}"><span class="chk-info" style="color:${hasDeath?'#9090b0':'var(--text2)'}">${(!isWait&&(p.prevPlace||p.diet))?[p.prevPlace?`이전: ${p.prevPlace}`:'',p.diet?`식이: ${p.diet}`:''].filter(Boolean).join(' · '):''}</span><div class="chk-tags">${[['lab','Lab'],['cxr','CXR'],['axr','AXR'],['ekg','EKG'],['cdiff','C.diff']].map(([k,l])=>`<span class="chk-tag${p[k]==='y'?' on':''}" id="chk-${p.id}-${k}" onclick="toggleChk(event,${p.id},'${k}')">${p[k]==='y'?'✓':'☐'} ${l}</span>`).join('')}</div></div>`:''}
    ${p.admDate&&!isWait&&getEffectiveProgress(p)==='-'?`<div style="padding:2px 14px 0;font-size:10px;color:#dc2626;font-weight:600;text-align:right">경과기록 작성일: ${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+progOffset(p));return `${d.getMonth()+1}/${d.getDate()}`;})()}</div>`:p.admDate&&!isWait&&getEffectiveProgress(p)==='n'?`<div style="padding:2px 14px 0;font-size:10px;color:${hasDeath?'#9090b0':'var(--text3)'};text-align:right">경과기록 작성일: ${(()=>{const d=new Date(p.admDate);d.setDate(d.getDate()+progOffset(p));return `${d.getMonth()+1}/${d.getDate()}`;})()}</div>`:''}
    ${(p.disease||p.note)?`<div style="padding:4px 14px 8px;font-size:12px;color:${hasDeath?'#9090b0':'var(--text2)'};border-top:0.5px solid ${hasDeath?'#2e2e42':'var(--border)'}">${[p.disease,p.note].filter(Boolean).join(' | ')}</div>`:''}
    ${p.ward==='퇴원환자'&&(!p.discharge||!p.deathNote)?`<div style="padding:3px 14px 5px;font-size:11px;font-weight:600;color:#dc2626;border-top:0.5px solid #fca5a5;background:#fef2f2">${[!p.discharge?'퇴원기록 미비':'',!p.deathNote?'임종기록 미비':''].filter(Boolean).join(' · ')}</div>`:''}
